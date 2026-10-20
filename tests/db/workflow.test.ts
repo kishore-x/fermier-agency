@@ -330,3 +330,14 @@ describe("product master", () => {
     expect(Number((await balance("IMP-1")).on_hand)).toBe(5);
   });
 });
+
+describe("sales executive scope", () => {
+  it("can update only assigned customers", async () => {
+    const c3 = (await one<{ id: string }>(db, "select id from customers where customer_code='CUS-DEMO-003'")).id;
+    await asUser(db, exec, (tx) => tx.query("update customers set phone = 'x' where id = $1", [c3]));
+    expect((await one<{ phone: string }>(db, "select phone from customers where id=$1", [c3])).phone).not.toBe("x");
+    await db.query("update customers set salesperson_id = $1 where id = $2", [exec, c3]);
+    await asUser(db, exec, (tx) => tx.query("update customers set phone = 'y' where id = $1", [c3]));
+    expect((await one<{ phone: string }>(db, "select phone from customers where id=$1", [c3])).phone).toBe("y");
+  });
+});
