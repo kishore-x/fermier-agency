@@ -26,7 +26,7 @@ export function Toaster() {
     <div className="pointer-events-none fixed bottom-20 right-4 z-[60] flex w-80 flex-col gap-2 md:bottom-4" aria-live="polite">
       {items.map((t) => (
         <div key={t.id} className="pointer-events-auto flex items-start gap-2 rounded-md border border-line bg-white p-3 text-sm shadow-lg">
-          {t.tone === "success" ? <CheckCircle2 className="h-4 w-4 shrink-0 text-brand" /> : <XCircle className="h-4 w-4 shrink-0 text-danger" />}
+          {t.tone === "success" ? <CheckCircle2 className="h-4 w-4 shrink-0 text-ok" /> : <XCircle className="h-4 w-4 shrink-0 text-danger" />}
           <span className="flex-1">{t.text}</span>
           <button onClick={() => setItems((s) => s.filter((x) => x.id !== t.id))} aria-label="Dismiss"><X className="h-4 w-4 text-muted" /></button>
         </div>

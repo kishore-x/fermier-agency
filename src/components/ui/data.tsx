@@ -80,7 +80,7 @@ export function MetricCard({ label, value, hint, href, tone }: {
   const body = (
     <Card className={cn("h-full p-4 transition-colors", href && "hover:border-navy/30")}>
       <p className="text-xs font-medium text-muted">{label}</p>
-      <p className={cn("mt-2 text-2xl font-semibold tnum text-ink", tone === "warn" && "text-amber-700", tone === "danger" && "text-danger", tone === "ok" && "text-brand-600")}>
+      <p className={cn("mt-2 text-2xl font-semibold tnum text-ink", tone === "warn" && "text-amber-700", tone === "danger" && "text-danger", tone === "ok" && "text-ok-600")}>
         {value}
       </p>
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
@@ -97,7 +97,7 @@ export function Timeline({ items, empty = "No activity yet." }: { items: Timelin
       {items.map((it, i) => (
         <li key={it.id} className="relative flex gap-3">
           <div className="flex flex-col items-center">
-            <span className={cn("mt-1.5 h-2.5 w-2.5 rounded-full", it.tone === "success" ? "bg-brand" : it.tone === "warn" ? "bg-amber-500" : "bg-navy")} />
+            <span className={cn("mt-1.5 h-2.5 w-2.5 rounded-full", it.tone === "success" ? "bg-ok" : it.tone === "warn" ? "bg-amber-500" : "bg-navy")} />
             {i < items.length - 1 && <span className="mt-1 w-px flex-1 bg-line" />}
           </div>
           <div className="min-w-0 flex-1 pb-1">

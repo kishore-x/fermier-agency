@@ -77,7 +77,7 @@ export default async function InventoryPage({ searchParams }: PageProps<"/admin/
                 return (
                   <li key={m.id} className="px-4 py-2">
                     <div className="flex justify-between gap-2"><span className="truncate">{prod?.name}</span>
-                      <span className={Number(m.quantity) < 0 ? "text-danger tnum" : "text-brand-600 tnum"}>{Number(m.quantity) > 0 ? "+" : ""}{formatQty(m.quantity)}</span></div>
+                      <span className={Number(m.quantity) < 0 ? "text-danger tnum" : "text-ok-600 tnum"}>{Number(m.quantity) > 0 ? "+" : ""}{formatQty(m.quantity)}</span></div>
                     <p className="text-xs text-muted">{humanize(m.movement_type)} · {m.reference_number ?? "—"} · {formatDateTime(m.created_at)}</p>
                   </li>
                 );

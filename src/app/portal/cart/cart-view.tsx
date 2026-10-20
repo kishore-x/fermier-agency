@@ -18,7 +18,7 @@ export function CartView({ addresses }: { addresses: { id: string; text: string 
   if (state?.ok) {
     return (
       <Card className="mx-auto max-w-lg p-8 text-center">
-        <CheckCircle2 className="mx-auto h-12 w-12 text-brand" />
+        <CheckCircle2 className="mx-auto h-12 w-12 text-ok" />
         <h1 className="mt-3 text-xl font-semibold">Order request submitted</h1>
         <p className="mt-1 text-sm text-muted">Your reference number is</p>
         <p className="mt-1 text-2xl font-bold tracking-wide text-navy">{state.reference}</p>

@@ -62,7 +62,7 @@ export default async function EnquiryDetail({ params }: PageProps<"/admin/enquir
                     <tr key={it.id} className="border-b border-line last:border-0">
                       <td className="px-4 py-2"><p className="font-medium">{it.name_snapshot}</p><p className="text-xs text-muted">{it.sku_snapshot}</p></td>
                       <td className="px-4 py-2 text-right tnum">{formatQty(it.quantity)}</td>
-                      <td className={`px-4 py-2 text-right tnum ${avail < Number(it.quantity) ? "text-amber-700" : "text-brand-600"}`}>{formatQty(avail)}</td>
+                      <td className={`px-4 py-2 text-right tnum ${avail < Number(it.quantity) ? "text-amber-700" : "text-ok-600"}`}>{formatQty(avail)}</td>
                     </tr>
                   );
                 })}</tbody>

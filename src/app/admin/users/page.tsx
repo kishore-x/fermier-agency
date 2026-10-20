@@ -39,7 +39,7 @@ export default async function UsersPage() {
                       const has = roles.includes(r);
                       return (
                         <ConfirmAction key={r} action={setUserRole} fields={{ user_id: u.id, role: r, on: String(!has) }}
-                          trigger={<span className={has ? "text-brand-600" : "text-muted"}>{has ? "✓ " : "+ "}{ROLE_LABEL[r]}</span>} triggerVariant={has ? "outline" : "ghost"}
+                          trigger={<span className={has ? "text-ok-600" : "text-muted"}>{has ? "✓ " : "+ "}{ROLE_LABEL[r]}</span>} triggerVariant={has ? "outline" : "ghost"}
                           title={`${has ? "Remove" : "Grant"} ${ROLE_LABEL[r]}?`} description={PERMS[r]} confirmLabel={has ? "Remove role" : "Grant role"} tone={has ? "danger" : "primary"} />
                       );
                     })}

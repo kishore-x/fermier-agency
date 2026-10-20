@@ -16,7 +16,7 @@ const TONE: Record<string, string> = {
 };
 
 const CLASSES: Record<string, string> = {
-  green: "bg-brand-50 text-brand-600 ring-brand/25",
+  green: "bg-ok-50 text-ok-600 ring-ok/25",
   blue: "bg-navy-50 text-navy ring-navy/15",
   amber: "bg-amber-50 text-amber-800 ring-amber-600/20",
   red: "bg-red-50 text-danger ring-danger/20",

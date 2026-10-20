@@ -46,7 +46,7 @@ export const getCategories = cache(async () => {
 
 export const getBrands = cache(async () => {
   const supabase = await createClient();
-  const { data } = await supabase.from("brands").select("id, name, slug").eq("is_active", true).order("name");
+  const { data } = await supabase.from("brands").select("id, name, slug, logo_url").eq("is_active", true).order("name");
   return data ?? [];
 });
 
@@ -54,9 +54,13 @@ export async function getFeatured(limit = 8) {
   const supabase = await createClient();
   const { data } = await supabase.from("catalog_products").select("*").eq("is_featured", true).order("featured_rank").order("name").limit(limit);
   const rows = (data ?? []) as CatalogProduct[];
-  const { data: specs } = await supabase.from("product_specifications").select("product_id, value, sort_order")
+  const { data: specs } = await supabase.from("product_specifications").select("product_id, label, value, sort_order")
     .in("product_id", rows.map((r) => r.id)).order("sort_order");
-  return rows.map((r) => ({ ...r, spec_line: (specs ?? []).filter((x) => x.product_id === r.id).slice(0, 3).map((x) => x.value) }));
+  return rows.map((r) => {
+    const mine = (specs ?? []).filter((x) => x.product_id === r.id);
+    const type = mine.find((x) => x.label === "Type")?.value ?? null;
+    return { ...r, type, spec_line: mine.filter((x) => x.label !== "Type").slice(0, type ? 2 : 3).map((x) => x.value) };
+  });
 }
 
 export async function getProductBySlug(slug: string) {

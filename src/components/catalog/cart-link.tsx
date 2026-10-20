@@ -5,9 +5,9 @@ import { ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "./cart";
 
-export function CartLink({ className, variant = "header" }: { className?: string; variant?: "header" | "tab" }) {
+export function CartLink({ className, variant = "header" }: { className?: string; variant?: "header" | "tab" | "light" }) {
   const { count, ready } = useCart();
-  const badge = (variant === "header" || (ready && count > 0)) && (
+  const badge = (variant !== "tab" || (ready && count > 0)) && (
     <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-brand px-1 text-center text-[10px] font-semibold leading-4 text-white tnum">
       {!ready ? 0 : count > 99 ? "99+" : count}
     </span>
@@ -20,8 +20,8 @@ export function CartLink({ className, variant = "header" }: { className?: string
     );
   }
   return (
-    <Link href="/portal/cart" className={cn("relative items-center rounded-md p-2 hover:bg-white/10", className)} aria-label={`Cart, ${count} items`}>
-      <ShoppingCart className="h-6 w-6" strokeWidth={1.75} />{badge}
+    <Link href="/portal/cart" className={cn("relative items-center rounded-md p-1.5", variant === "light" ? "text-ink-900 hover:bg-band" : "hover:bg-white/10", className)} aria-label={`Cart, ${count} items`}>
+      <ShoppingCart className={variant === "light" ? "h-5 w-5" : "h-6 w-6"} strokeWidth={1.75} />{badge}
     </Link>
   );
 }

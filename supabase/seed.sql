@@ -2,8 +2,8 @@
 -- Prices, stock levels and customers are fictional. No real GSTINs or registration numbers.
 
 insert into company_settings (company_name, legal_name, address, phone, email, whatsapp_number, default_terms)
-values ('Fermier Agency', 'Fermier Agency (Sample)', 'Sample address — update in Settings', '+91 00000 00000',
-        'sales@example.com', '910000000000',
+values ('Fermier Agency', 'Fermier Agency (Sample)', 'Chennai, Tamil Nadu, India', '+91 44 xxxx xxxx',
+        'sales@fermieragency.com', '910000000000',
         E'1. Prices are ex-warehouse unless stated otherwise.\n2. GST extra as applicable.\n3. Delivery subject to stock availability at the time of order confirmation.\n4. Warranty as per manufacturer terms.\n5. This quotation is valid until the expiry date shown above.');
 
 insert into warehouses (code, name, address, is_default) values ('MAIN', 'Main Warehouse', 'Sample warehouse address', true);
@@ -142,7 +142,7 @@ select p.id, c.cost from products p join (values
 
 update products set is_featured = false;
 update products p set is_featured = true, featured_rank = r.rank
-from (values ('AT-AC-100L',1),('PM-DB-1500',2),('FP-PT-2000',3),('PM-GEN-3K',4),('YT-WN-500P',5),('YT-WN-500E',6)) as r(sku, rank)
+from (values ('AT-AC-100L',7),('PM-DB-1500',8),('FP-PT-2000',9),('PM-GEN-3K',10),('YT-WN-500P',11),('YT-WN-500E',12)) as r(sku, rank)
 where p.sku = r.sku;
 
 -- Category and product photos (cropped from the reference design; replace with licensed photography)
@@ -161,6 +161,70 @@ select p.id, v.url, p.name, 0 from products p join (values
  ('PM-GEN-7K','/demo/cat-generators.jpg'),('FP-PW-2200','/demo/cat-washers.jpg'),('FP-PW-3000','/demo/quick-washer.jpg'),
  ('AK-PWD-7HP','/demo/cat-agri.jpg')
 ) as v(sku, url) on v.sku = p.sku;
+
+-- ===== Reference-design catalogue (construction equipment) =====
+insert into categories (name, slug, description, sort_order, image_url) values
+ ('Concrete Floor Finishing Equipment','concrete-floor-finishing-equipment','Power trowels and floor finishing machines',1,'/site/cat-floor-finishing.jpg'),
+ ('Compaction Equipment','compaction-equipment','Plate compactors, rammers and rollers',2,'/site/cat-compaction.jpg'),
+ ('Concrete Cutting Equipment','concrete-cutting-equipment','Floor saws and concrete cutters',3,'/site/cat-concrete-cutting.jpg'),
+ ('Lighting Towers','lighting-towers','Mobile LED and metal-halide lighting towers',4,'/site/cat-lighting-towers.jpg');
+update categories c set sort_order = v.o, image_url = coalesce(v.img, c.image_url) from (values
+ ('generators',5,'/site/cat-generators.jpg'),('air-compressors',6,'/site/cat-air-compressors.jpg'),
+ ('material-handling-equipment',7,'/site/cat-material-handling.jpg'),('power-tools',8,'/site/cat-power-tools.jpg'),
+ ('construction-equipment',9,null),('lifting-equipment',10,null),('car-washers-vacuum-cleaners',11,null),
+ ('agriculture-garden-equipment',12,null),('pressure-washers',13,null),('fogging-machines',14,null),('mini-cranes',15,null),('welding-equipment',16,null)
+) as v(slug, o, img) where c.slug = v.slug;
+
+insert into brands (name, slug, logo_url) values
+ ('Masalta','masalta','/site/brand-masalta.png'),('Wacker Neuson','wacker-neuson','/site/brand-wacker.png'),
+ ('Bomag','bomag','/site/brand-bomag.png'),('Mikasa','mikasa','/site/brand-mikasa.png'),
+ ('Belle','belle','/site/brand-belle.png'),('Dynapac','dynapac','/site/brand-dynapac.png'),
+ ('JCB','jcb',null),('Atlas Copco','atlas-copco',null),('Generac','generac',null);
+
+with c as (select slug, id from categories), b as (select slug, id from brands)
+insert into products (sku, slug, name, brand_id, manufacturer, category_id, model_number, short_description, description,
+  unit, selling_price, tax_rate, hsn_code, price_visibility, reorder_threshold, is_featured, featured_rank, status, is_sample_data)
+select v.sku, v.slug, v.name, (select id from b where b.slug = v.brand), v.mfr, (select id from c where c.slug = v.cat), v.model,
+  v.short_d, v.long_d, 'Nos', v.price, 18.00, v.hsn, v.vis::price_visibility, 1, true, v.rnk, 'active', true
+from (values
+ ('MS-MT36','masalta-mt36-power-trowel','Masalta MT36','masalta','Masalta (sample listing)','concrete-floor-finishing-equipment','MT36',
+  'Walk-behind power trowel for concrete floor finishing.','36" walk-behind power trowel with 6.5 HP petrol engine, pitch control and safety stop. SAMPLE PRODUCT DATA.',
+  165000.00,'84798200','show_price',1),
+ ('WN-VP1550','wacker-neuson-vp1550-plate-compactor','Wacker Neuson VP1550','wacker-neuson','Wacker Neuson (sample listing)','compaction-equipment','VP1550',
+  'Single-direction vibratory plate for soil and asphalt.','24 kN centrifugal force vibratory plate compactor with petrol engine and water tank. SAMPLE PRODUCT DATA.',
+  98000.00,'84294000','show_price',2),
+ ('MS-MF14','masalta-mf14-concrete-cutter','Masalta MF14','masalta','Masalta (sample listing)','concrete-cutting-equipment','MF14',
+  'Walk-behind floor saw for concrete and asphalt.','14" blade concrete cutter with 13 HP petrol engine and water cooling. SAMPLE PRODUCT DATA.',
+  112000.00,'84649000','show_price',3),
+ ('JCB-G115QS','jcb-g115qs-generator','JCB G115QS','jcb','JCB (sample listing)','generators','G115QS',
+  'Super-silent diesel generator for site power.','115 kVA diesel generator in a sound-attenuated canopy. SAMPLE PRODUCT DATA.',
+  null,'85021320','on_request',4),
+ ('AC-XAS186','atlas-copco-xas-186-air-compressor','Atlas Copco XAS 186','atlas-copco','Atlas Copco (sample listing)','air-compressors','XAS 186',
+  'Portable diesel screw compressor.','Towable 186 CFM, 7 bar diesel-driven screw compressor. SAMPLE PRODUCT DATA.',
+  null,'84148011','on_request',5),
+ ('GN-MLT4060','generac-mlt4060-lighting-tower','Generac MLT4060','generac','Generac (sample listing)','lighting-towers','MLT4060',
+  'Mobile LED lighting tower.','Towable lighting tower with 4 x 1000 W LED lamps and hydraulic mast. SAMPLE PRODUCT DATA.',
+  null,'94054090','on_request',6)
+) as v(sku, slug, name, brand, mfr, cat, model, short_d, long_d, price, hsn, vis, rnk);
+
+insert into product_specifications (product_id, spec_group, label, value, sort_order)
+select p.id, s.grp, s.label, s.value, s.ord from products p join (values
+ ('MS-MT36','Overview','Type','Power Trowel',0),('MS-MT36','Performance','Trowel diameter','36"',1),('MS-MT36','Engine','Engine power','6.5 HP',2),('MS-MT36','Engine','Fuel','Petrol',3),
+ ('WN-VP1550','Overview','Type','Plate Compactor',0),('WN-VP1550','Performance','Centrifugal force','24 kN',1),('WN-VP1550','Engine','Fuel','Petrol',2),('WN-VP1550','Performance','Plate width','500 mm',3),
+ ('MS-MF14','Overview','Type','Concrete Cutter',0),('MS-MF14','Performance','Blade diameter','14"',1),('MS-MF14','Engine','Engine power','13 HP',2),('MS-MF14','Performance','Max cutting depth','125 mm',3),
+ ('JCB-G115QS','Overview','Type','Generator',0),('JCB-G115QS','Output','Prime power','115 kVA',1),('JCB-G115QS','Engine','Fuel','Diesel',2),('JCB-G115QS','Output','Phase','Three phase',3),
+ ('AC-XAS186','Overview','Type','Air Compressor',0),('AC-XAS186','Performance','Free air delivery','186 CFM',1),('AC-XAS186','Performance','Working pressure','7 bar',2),('AC-XAS186','Engine','Fuel','Diesel',3),
+ ('GN-MLT4060','Overview','Type','Lighting Tower',0),('GN-MLT4060','Performance','Lamps','4 x 1000W LED',1),('GN-MLT4060','Performance','Mast height','9 m',2),('GN-MLT4060','Engine','Fuel','Diesel',3)
+) as s(sku, grp, label, value, ord) on s.sku = p.sku;
+
+insert into product_images (product_id, url, alt, sort_order)
+select p.id, v.url, p.name, 0 from products p join (values
+ ('MS-MT36','/site/prod-masalta-mt36.jpg'),('WN-VP1550','/site/prod-wacker-vp1550.jpg'),('MS-MF14','/site/prod-masalta-mf14.jpg'),
+ ('JCB-G115QS','/site/prod-jcb-g115qs.jpg'),('AC-XAS186','/site/prod-atlas-xas186.jpg'),('GN-MLT4060','/site/prod-generac-mlt4060.jpg')
+) as v(sku, url) on v.sku = p.sku;
+
+insert into product_costs (product_id, purchase_cost)
+select p.id, v.cost from products p join (values ('MS-MT36',128000.00),('WN-VP1550',76000.00),('MS-MF14',87000.00),('JCB-G115QS',1450000.00),('AC-XAS186',1180000.00),('GN-MLT4060',640000.00)) as v(sku, cost) on v.sku = p.sku;
 
 -- Specifications (rendered dynamically by the UI)
 insert into product_specifications (product_id, spec_group, label, value, sort_order)
@@ -206,7 +270,8 @@ begin
   for r in select p.id, v.qty from products p join (values
     ('YT-WN-500E',14),('YT-WN-500P',9),('YT-WN-1000',3),('YT-MC-FR01',6),('FP-PW-2200',22),('FP-PW-3000',4),
     ('AK-PWD-7HP',7),('AK-BC-52',2),('AT-AC-100L',11),('AT-AC-24L',18),('PM-GEN-3K',5),('PM-GEN-7K',0),
-    ('FP-PT-2000',10),('FP-VC-30L',3),('AK-FG-TH',1),('PM-WM-200',16),('PM-DB-1500',12),('PM-AG-4',40)
+    ('FP-PT-2000',10),('FP-VC-30L',3),('AK-FG-TH',1),('PM-WM-200',16),('PM-DB-1500',12),('PM-AG-4',40),
+    ('MS-MT36',6),('WN-VP1550',9),('MS-MF14',4),('JCB-G115QS',2),('AC-XAS186',2),('GN-MLT4060',3)
   ) as v(sku, qty) on v.sku = p.sku loop
     insert into inventory_balances(product_id, warehouse_id) values (r.id, wh);
     if r.qty > 0 then

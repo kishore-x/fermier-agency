@@ -27,7 +27,7 @@ export function ProductCard({ p }: { p: CatalogProduct }) {
             ) : (
               <span className="text-sm font-medium text-navy">Price on request</span>
             )}
-            <span className={available > 0 ? "text-xs text-brand-600" : "text-xs text-muted"}>
+            <span className={available > 0 ? "text-xs text-ok-600" : "text-xs text-muted"}>
               {available > 0 ? "In stock" : "On order"}
             </span>
           </div>

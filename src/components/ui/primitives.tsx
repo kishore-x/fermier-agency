@@ -132,7 +132,7 @@ export function Alert({ tone = "info", children, className }: { tone?: "info" | 
     info: "border-navy/20 bg-navy-50 text-navy",
     warn: "border-warn/30 bg-amber-50 text-amber-900",
     error: "border-danger/30 bg-red-50 text-danger",
-    success: "border-brand/30 bg-brand-50 text-brand-600",
+    success: "border-ok/30 bg-ok-50 text-ok-600",
   };
   return <div className={cn("rounded-md border px-3 py-2 text-sm", tones[tone], className)}>{children}</div>;
 }

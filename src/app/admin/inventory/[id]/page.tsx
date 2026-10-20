@@ -42,7 +42,7 @@ export default async function ProductStockPage({ params, searchParams }: PagePro
             columns={[
               { key: "at", header: "When", cell: (m: M) => <span className="whitespace-nowrap text-xs">{formatDateTime(m.created_at)}</span> },
               { key: "type", header: "Type", cell: (m: M) => humanize(m.movement_type) },
-              { key: "qty", header: "Qty", align: "right", cell: (m: M) => <span className={Number(m.quantity) < 0 ? "text-danger" : "text-brand-600"}>{Number(m.quantity) > 0 ? "+" : ""}{formatQty(m.quantity)}</span> },
+              { key: "qty", header: "Qty", align: "right", cell: (m: M) => <span className={Number(m.quantity) < 0 ? "text-danger" : "text-ok-600"}>{Number(m.quantity) > 0 ? "+" : ""}{formatQty(m.quantity)}</span> },
               { key: "oh", header: "On hand after", align: "right", cell: (m: M) => formatQty(m.on_hand_after) },
               { key: "rs", header: "Reserved after", align: "right", cell: (m: M) => formatQty(m.reserved_after) },
               { key: "ref", header: "Reference", cell: (m: M) => { const l = refLink(m.reference_type, m.reference_id); return l ? <Link href={l} className="text-navy hover:underline">{m.reference_number}</Link> : m.reference_number ?? "—"; } },

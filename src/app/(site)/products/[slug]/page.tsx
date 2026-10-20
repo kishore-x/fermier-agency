@@ -55,7 +55,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
                 <p className="text-sm text-muted">Add to cart and submit — our sales team will send a formal quotation.</p>
               </>
             )}
-            <p className={available > 0 ? "mt-3 text-sm font-medium text-brand-600" : "mt-3 text-sm font-medium text-amber-700"}>
+            <p className={available > 0 ? "mt-3 text-sm font-medium text-ok-600" : "mt-3 text-sm font-medium text-amber-700"}>
               {available > 0 ? `In stock — ${available} ${p.unit} available` : "Currently on order — lead time confirmed on quotation"}
             </p>
             <AddToCartButton product={p} withQty className="mt-4" />

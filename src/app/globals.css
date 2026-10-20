@@ -4,9 +4,17 @@
   --color-navy: #191a3d;
   --color-navy-700: #26284f;
   --color-navy-50: #eceef7;
-  --color-brand: #4caf50;
-  --color-brand-600: #3f9443;
-  --color-brand-50: #edf7ee;
+  --color-brand: #077ff4;
+  --color-brand-600: #0567d0;
+  --color-brand-50: #e8f2fe;
+  --color-ok: #2e9e4f;
+  --color-ok-600: #23803e;
+  --color-ok-50: #eaf6ee;
+  --color-band: #eaf0f5;
+  --color-page: #fafcfe;
+  --color-charcoal: #2c3239;
+  --color-ink-900: #0e1b2c;
+  --color-footer: #1c2025;
   --color-canvas: #f5f6fa;
   --color-ink: #171923;
   --color-muted: #737784;
@@ -14,6 +22,7 @@
   --color-danger: #c0392b;
   --color-warn: #b7791f;
   --font-sans: var(--font-inter);
+  --font-display: var(--font-barlow);
 }
 
 body {

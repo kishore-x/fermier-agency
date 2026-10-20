@@ -20,7 +20,7 @@ export default async function AuditLogsPage({ searchParams }: PageProps<"/admin/
   const diff = (b: unknown, a: unknown) => {
     const before = (b ?? {}) as Record<string, unknown>, after = (a ?? {}) as Record<string, unknown>;
     return Object.keys({ ...before, ...after }).filter((k) => JSON.stringify(before[k]) !== JSON.stringify(after[k]) && !["updated_at"].includes(k)).slice(0, 6)
-      .map((k) => <div key={k} className="font-mono text-[11px]"><span className="text-muted">{k}:</span> {b ? <><span className="text-danger line-through">{JSON.stringify(before[k]) ?? "∅"}</span> → </> : null}<span className="text-brand-600">{JSON.stringify(after[k]) ?? "∅"}</span></div>);
+      .map((k) => <div key={k} className="font-mono text-[11px]"><span className="text-muted">{k}:</span> {b ? <><span className="text-danger line-through">{JSON.stringify(before[k]) ?? "∅"}</span> → </> : null}<span className="text-ok-600">{JSON.stringify(after[k]) ?? "∅"}</span></div>);
   };
   return (
     <>

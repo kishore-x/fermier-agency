@@ -43,7 +43,7 @@ export default async function PoDetail({ params }: PageProps<"/admin/purchase-or
               <thead><tr className="border-b border-line bg-canvas text-left text-xs uppercase text-muted"><th className="px-4 py-2">Check</th><th className="px-4 py-2">PO</th><th className="px-4 py-2">Quotation</th><th className="px-4 py-2" /></tr></thead>
               <tbody>{checks.map(([l, a, b, ok]) => (
                 <tr key={l} className="border-b border-line"><td className="px-4 py-2">{l}</td><td className="px-4 py-2 tnum">{a}</td><td className="px-4 py-2 tnum">{b}</td>
-                  <td className="px-4 py-2">{ok ? <Check className="h-4 w-4 text-brand" /> : <X className="h-4 w-4 text-danger" />}</td></tr>
+                  <td className="px-4 py-2">{ok ? <Check className="h-4 w-4 text-ok" /> : <X className="h-4 w-4 text-danger" />}</td></tr>
               ))}</tbody>
             </table>
             <p className="px-4 py-2 text-xs text-muted">Also compare items and quantities on the PO document with the quotation lines before verifying.</p>
