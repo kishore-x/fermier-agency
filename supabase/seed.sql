@@ -390,3 +390,117 @@ select p.id, 'Overview', 'Type', v.t, 0 from products p join (values
  ('FP-PT-2000','Electric Stacker'),('FP-VC-30L','Wet & Dry Vacuum'),('AK-FG-TH','Thermal Fogger'),('PM-WM-200','Welding Machine'),
  ('PM-DB-1500','Rotary Hammer'),('PM-AG-4','Angle Grinder')
 ) as v(sku, t) on v.sku = p.sku;
+
+-- ===== Category landing-page content (SAMPLE copy — review before publishing) =====
+update categories c set overview = v.ov, key_points = v.kp, applications = v.app, buying_guide = v.bg::jsonb, faqs = v.fq::jsonb
+from (values
+ ('compaction-equipment',
+  E'Compaction equipment increases the density of soil, aggregate and asphalt by removing air voids, so the ground can carry load without settling. Correct compaction is the foundation of every durable road, slab, paver bed and trench reinstatement — poorly compacted layers lead to cracking, rutting and costly rework.\n\nOur range covers vibratory plate compactors for granular soils and asphalt, reversible plates for deeper lifts and cohesive material, and rammers for trenches and confined areas. Every machine is supplied with commissioning support, operator guidance and genuine spares.',
+  array['Single-direction and reversible vibratory plates','Centrifugal force from 10 kN to 60 kN+','Petrol and diesel engine options','Water sprinkler kits for asphalt work','Low hand-arm vibration handles','Service, spares and operator training'],
+  array['Road and highway sub-base','Interlocking paver bedding','Asphalt patch and repair','Trench and pipeline backfill','Building foundations and plinths','Landscaping and driveways'],
+  '[{"title":"Match force to layer depth","text":"Plates up to 25 kN suit lifts of 20–30 cm of granular material; for deeper lifts or cohesive soils choose a reversible plate (30 kN+) or a rammer."},{"title":"Soil type matters","text":"Vibratory plates work best on granular soils, sand and gravel. Clay and silt need the impact action of a rammer."},{"title":"Asphalt work","text":"Choose a plate with a water tank and sprinkler so hot mix does not stick to the base plate."},{"title":"Site access","text":"Plate width decides how close you can work to kerbs and walls — narrower plates for trenches, wider plates for open areas."},{"title":"Engine and fuel","text":"Petrol engines are lighter and common for plates up to ~25 kN; diesel suits heavy reversible plates and continuous duty."}]',
+  '[{"q":"What is the difference between a plate compactor and a rammer?","a":"A plate compactor vibrates at high frequency and suits granular soils and asphalt. A rammer delivers high-impact blows and suits cohesive soils like clay and narrow trenches."},{"q":"How many passes are needed?","a":"Typically 3–5 passes per lift, overlapping each pass by about 10 cm. Field density tests confirm when target compaction is reached."},{"q":"Do you provide service and spares?","a":"Yes — commissioning, preventive maintenance, breakdown support and genuine spares through our service network."},{"q":"Can I get a demonstration?","a":"Contact our sales team to arrange a site demonstration or a visit to our Chennai showroom."}]'),
+ ('concrete-floor-finishing-equipment',
+  E'Concrete floor finishing equipment produces flat, dense and durable slab surfaces. Power trowels float and polish fresh concrete, screeds level it, and vacuum dewatering systems remove excess water for higher surface strength — together they deliver industrial-grade floors faster and with fewer defects than hand finishing.\n\nWe supply walk-behind and ride-on power trowels, screeds and accessories, with blade and pan options to suit floor hardeners and different finishing stages.',
+  array['Walk-behind and ride-on power trowels','24" to 46" working diameters','Quick-pitch blade adjustment','Combination blades and float pans','Safety stop and balanced handling','Commissioning and operator training'],
+  array['Warehouses and logistics parks','Factories and industrial floors','Parking decks and podiums','Commercial and residential slabs','Floor hardener applications'],
+  '[{"title":"Size to the pour","text":"36\" trowels suit most commercial slabs; 46\" or ride-on trowels give higher output on large industrial pours."},{"title":"Blades and pans","text":"Use float pans for the first pass and combination or finishing blades for later passes and hardener work."},{"title":"Engine power","text":"5.5–9 HP petrol engines cover most walk-behind trowels; higher power helps on stiff mixes."}]',
+  '[{"q":"When can I start trowelling?","a":"When the concrete can support the operator with a footprint of about 3–6 mm — usually a few hours after placing, depending on mix and weather."},{"q":"Do you supply spare blades?","a":"Yes, finishing, float and combination blades are stocked for the trowels we sell."}]'),
+ ('concrete-cutting-equipment',
+  E'Concrete cutting equipment makes clean, accurate cuts in concrete, asphalt and masonry. Walk-behind floor saws cut expansion joints and trenches, while hand-held cut-off saws handle openings, pipes and kerbs. Water-cooled diamond blades keep dust down and extend blade life.',
+  array['Walk-behind floor saws 14"–20"','Hand-held petrol cut-off saws','Water cooling for dust control','Depth control hand-wheels','Diamond blades for concrete and asphalt'],
+  array['Expansion and control joints','Road and runway repair','Utility trenching','Openings for doors and ducts','Demolition preparation'],
+  '[{"title":"Cutting depth","text":"Blade diameter sets maximum depth — a 14\" blade cuts about 125 mm, an 18\" blade about 160 mm."},{"title":"Material","text":"Choose cured-concrete, green-concrete or asphalt blades to match the surface."}]',
+  '[{"q":"When should control joints be cut?","a":"Usually within 6–18 hours of placing, once the concrete can be cut without ravelling."}]'),
+ ('lighting-towers',
+  E'Mobile lighting towers provide bright, safe illumination for night-time construction, road works, mining and events. Modern LED towers deliver more light with lower fuel use, and telescopic masts spread light evenly across large areas.',
+  array['LED and metal-halide options','Hydraulic or manual telescopic masts up to 9 m','Long run time on a single tank','Road-towable trailers with outriggers'],
+  array['Night-time construction','Highway and road works','Mining and quarry sites','Events and emergency response'],
+  '[{"title":"LED vs metal-halide","text":"LED towers use far less fuel, start instantly and need less maintenance."},{"title":"Coverage","text":"Four 1000 W-equivalent LED lamps on a 9 m mast typically light around 4,000–5,000 m²."}]',
+  '[{"q":"How long does a lighting tower run on one tank?","a":"LED towers commonly run 100+ hours on a full tank, depending on model and load."}]'),
+ ('generators',
+  E'Generators provide reliable power for construction sites, workshops, commercial buildings and events. We supply portable petrol generators for tools and site cabins, and silent diesel generators from 5 kVA to 125 kVA+ for continuous and standby power.',
+  array['Portable petrol and silent diesel sets','AVR for stable voltage','Acoustic canopies for low noise','Auto start and digital controllers','Installation and service support'],
+  array['Construction site power','Standby power for offices and shops','Events and temporary installations','Workshops and farms'],
+  '[{"title":"Size the load","text":"Add up running watts of all equipment and allow 20–25% headroom; motors need extra starting capacity."},{"title":"Fuel and duty","text":"Petrol suits occasional, portable use; diesel suits long running hours and larger loads."}]',
+  '[{"q":"Do you install generators?","a":"Yes — our team handles installation, changeover wiring and commissioning on request."}]'),
+ ('air-compressors',
+  E'Air compressors power pneumatic tools, spray painting, sandblasting and pipeline testing. Our range spans portable oil-free units for workshops through belt-driven piston compressors to towable diesel screw compressors for heavy site work.',
+  array['Oil-free, piston and screw compressors','Tank sizes from 24 L to 500 L','Towable diesel units up to 400 CFM','Auto cut-off pressure switches'],
+  array['Pneumatic breakers and drills','Spray painting and finishing','Sandblasting','Tyre service and workshops'],
+  '[{"title":"Air demand (CFM)","text":"Sum the CFM of tools used at once and add 25–30%."},{"title":"Pressure","text":"Most pneumatic tools need 6–7 bar; sandblasting may need more."}]',
+  '[{"q":"Piston or screw compressor?","a":"Piston compressors suit intermittent use; screw compressors suit continuous duty and higher air demand."}]'),
+ ('material-handling-equipment',
+  E'Material handling equipment moves and lifts goods safely in warehouses, factories and sites. We supply hand pallet trucks, manual and semi-electric stackers, and trolleys that cut handling time and reduce manual lifting injuries.',
+  array['Hand pallet trucks 2–3 ton','Manual and semi-electric stackers','Lift heights up to 3.5 m','Polyurethane and nylon wheel options'],
+  array['Warehouses and distribution','Factories and stores','Retail back-rooms','Loading bays'],
+  '[{"title":"Capacity and lift height","text":"Check the heaviest pallet and the highest rack level you need to reach."},{"title":"Floor","text":"PU wheels suit smooth indoor floors; nylon wheels suit rougher surfaces."}]',
+  '[{"q":"Do stackers need a licence?","a":"Pedestrian stackers generally need trained operators; follow your site safety policy."}]'),
+ ('power-tools',
+  E'Professional power tools for construction and fabrication: rotary hammers, demolition breakers, angle grinders, cut-off saws and more, from trusted international brands with service and spares support.',
+  array['Rotary hammers and breakers','Angle grinders and cut-off saws','Corded and cordless options','Genuine accessories and spares'],
+  array['Concrete drilling and chiselling','Metal cutting and grinding','Fabrication and maintenance'],
+  '[{"title":"Rotary hammer size","text":"SDS-plus suits holes up to ~26 mm; SDS-max suits larger holes and heavy chiselling."}]',
+  '[{"q":"Are spares available?","a":"Yes — carbon brushes, chucks and common wear parts are stocked."}]'),
+ ('lifting-equipment',
+  E'Lifting equipment moves building materials safely to upper floors. Our Y-tal construction winches and mini crane frames form a complete rooftop hoist for bricks, cement, sand and steel — a practical alternative to manual carrying on residential and small commercial projects.',
+  array['500 kg and 1 ton construction winches','Single-phase and three-phase motors','Electromagnetic brake and limit switch options','Mini crane frames with 180°–360° swivel'],
+  array['Residential construction','Small commercial buildings','Renovation and repair','Rooftop material hoisting'],
+  '[{"title":"Capacity","text":"500 kg winches suit most residential work; choose 1 ton for steel and heavier loads."},{"title":"Power supply","text":"Single-phase 220 V models suit most sites; three-phase models deliver higher duty."},{"title":"Lifting height","text":"Match rope length to building height plus a margin — 40 m or 60 m options."}]',
+  '[{"q":"Do I need a mini crane frame?","a":"Yes for rooftop use — the frame mounts the winch and swings loads in over the parapet."},{"q":"Is the wire rope covered by warranty?","a":"Wire rope is a consumable; motor and gearbox carry warranty."}]')
+) as v(slug, ov, kp, app, bg, fq)
+where c.slug = v.slug;
+
+update categories set overview = description || '. Contact our team for selection advice, pricing and availability.'
+where overview is null and description is not null;
+
+-- More compaction equipment (sample listings) so the category comparison is meaningful
+with c as (select id from categories where slug = 'compaction-equipment'), b as (select slug, id from brands)
+insert into products (sku, slug, name, brand_id, manufacturer, category_id, model_number, short_description, description, unit,
+  selling_price, tax_rate, hsn_code, price_visibility, reorder_threshold, status, is_sample_data, features, applications, in_the_box, warranty)
+select v.sku, v.slug, v.name, (select id from b where b.slug = v.brand), v.mfr, (select id from c), v.model, v.short_d, v.long_d, 'Nos',
+  v.price, 18, '84294000', v.vis::price_visibility, 1, 'active', true, v.feat, v.app, v.box, v.warr
+from (values
+ ('BM-BP1035','bomag-bp-10-35-plate-compactor','Bomag BP 10/35','bomag','Bomag (sample listing)','BP 10/35',
+  'Lightweight single-direction plate for paving and patching.',
+  'A compact, easy-to-handle vibratory plate for paver bedding, patch repair and light backfill work, with a low-vibration handle and optional water tank. SAMPLE PRODUCT DATA.',
+  72000.00,'show_price', array['10 kN centrifugal force','Compact 350 mm plate for tight areas','Low-vibration folding handle','Optional water tank'],
+  array['Paver bedding','Patch repair','Light backfill'], array['Plate compactor','Operator manual'], '12 months (sample terms).'),
+ ('MK-MVH308','mikasa-mvh-308-reversible-plate','Mikasa MVH-308','mikasa','Mikasa (sample listing)','MVH-308',
+  'Heavy reversible plate for deep lifts and cohesive soils.',
+  'A diesel-powered reversible vibratory plate with forward/reverse hydraulic control, ideal for deep granular lifts, trench work and foundations where turning space is limited. SAMPLE PRODUCT DATA.',
+  null,'on_request', array['Forward and reverse travel','High centrifugal force for deep lifts','Diesel engine for continuous duty','Hydrostatic control handle'],
+  array['Foundations','Trench backfill','Deep granular lifts'], array['Reversible plate','Tool kit','Operator manual'], '12 months (sample terms).'),
+ ('MK-MT55','mikasa-mt-55-tamping-rammer','Mikasa MT-55','mikasa','Mikasa (sample listing)','MT-55',
+  'Tamping rammer for clay, silt and narrow trenches.',
+  'A high-impact tamping rammer for cohesive soils and narrow trenches where plates cannot work, with a 4-stroke petrol engine and protective roll frame. SAMPLE PRODUCT DATA.',
+  95000.00,'show_price', array['High impact force for cohesive soils','Narrow shoe for trenches','4-stroke petrol engine','Protective roll frame'],
+  array['Trench compaction','Clay and silt soils','Around pipes and foundations'], array['Rammer','Tool kit','Operator manual'], '12 months (sample terms).')
+) as v(sku, slug, name, brand, mfr, model, short_d, long_d, price, vis, feat, app, box, warr);
+
+insert into product_specifications (product_id, spec_group, label, value, sort_order)
+select p.id, s.grp, s.label, s.value, s.ord from products p join (values
+ ('BM-BP1035','Overview','Type','Plate Compactor',0),('BM-BP1035','Performance','Centrifugal force','10 kN',1),('BM-BP1035','Performance','Vibration frequency','100 Hz',2),
+ ('BM-BP1035','Performance','Travel speed','24 m/min',3),('BM-BP1035','Performance','Area capacity','500 m²/h',4),('BM-BP1035','Performance','Compaction depth','up to 20 cm',5),
+ ('BM-BP1035','Engine','Fuel','Petrol',6),('BM-BP1035','Dimensions','Operating weight','58 kg',7),
+ ('MK-MVH308','Overview','Type','Reversible Plate',0),('MK-MVH308','Performance','Centrifugal force','45 kN',1),('MK-MVH308','Performance','Vibration frequency','68 Hz',2),
+ ('MK-MVH308','Performance','Travel speed','22 m/min',3),('MK-MVH308','Performance','Area capacity','600 m²/h',4),('MK-MVH308','Performance','Compaction depth','up to 50 cm',5),
+ ('MK-MVH308','Engine','Fuel','Diesel',6),('MK-MVH308','Dimensions','Operating weight','310 kg',7),
+ ('MK-MT55','Overview','Type','Tamping Rammer',0),('MK-MT55','Performance','Impact force','10 kN',1),('MK-MT55','Performance','Blows per minute','660 bpm',2),
+ ('MK-MT55','Performance','Travel speed','12 m/min',3),('MK-MT55','Performance','Compaction depth','up to 40 cm',5),
+ ('MK-MT55','Engine','Fuel','Petrol',6),('MK-MT55','Dimensions','Operating weight','68 kg',7)
+) as s(sku, grp, label, value, ord) on s.sku = p.sku;
+
+insert into product_images (product_id, url, alt, sort_order)
+select id, '/site/cat-compaction.jpg', name, 0 from products where sku = 'BM-BP1035';
+insert into product_costs (product_id, purchase_cost)
+select id, v.c from products p join (values ('BM-BP1035',55000.00),('MK-MVH308',420000.00),('MK-MT55',72000.00)) as v(sku, c) on v.sku = p.sku;
+
+do $$
+declare r record; wh uuid := (select id from warehouses where is_default);
+begin
+  for r in select p.id, v.qty from products p join (values ('BM-BP1035',5),('MK-MVH308',1),('MK-MT55',3)) as v(sku, qty) on v.sku = p.sku loop
+    insert into inventory_balances(product_id, warehouse_id) values (r.id, wh) on conflict do nothing;
+    perform apply_inventory_movement(r.id, wh, 'goods_received', r.qty, 0, 'opening_balance', null, 'OPENING', 'Sample opening stock', null);
+  end loop;
+end $$;

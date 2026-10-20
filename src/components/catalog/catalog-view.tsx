@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils";
 
 const SORTS: [string, string][] = [["featured", "Featured"], ["name", "Name A–Z"], ["price_asc", "Price: low to high"], ["price_desc", "Price: high to low"], ["newest", "Newest"]];
 
-export async function CatalogView({ filters, basePath, title, lockedCategory }: {
-  filters: CatalogFilters; basePath: string; title: string; lockedCategory?: string;
+export async function CatalogView({ filters, basePath, title, lockedCategory, embedded }: {
+  filters: CatalogFilters; basePath: string; title: string; lockedCategory?: string; embedded?: boolean;
 }) {
   const [{ rows, total, page, pageSize }, categories, brands, company] = await Promise.all([
     listCatalog({ ...filters, category: lockedCategory ?? filters.category }, 24),
@@ -29,14 +29,23 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
     : k === "availability" ? "In stock only" : k === "min" ? `Min ₹${v}` : k === "max" ? `Max ₹${v}` : `“${v}”`;
 
   return (
-    <div className="container-site py-6">
-      <nav className="mb-2 text-xs text-muted"><Link href="/" className="hover:text-ink">Home</Link> / <Link href="/catalog" className="hover:text-ink">Catalog</Link>{lockedCategory && <> / {title}</>}</nav>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">{title}</h1>
+    <div id="products" className="container-site scroll-mt-20 py-6">
+      {embedded ? (
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <h2 className="font-display text-[22px] font-bold uppercase tracking-tight text-ink-900">{title}</h2>
           <p className="text-sm text-muted tnum">{total} product{total === 1 ? "" : "s"}</p>
         </div>
-      </div>
+      ) : (
+        <>
+          <nav className="mb-2 text-xs text-muted"><Link href="/" className="hover:text-ink">Home</Link> / <Link href="/catalog" className="hover:text-ink">Catalog</Link>{lockedCategory && <> / {title}</>}</nav>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="text-2xl font-semibold">{title}</h1>
+              <p className="text-sm text-muted tnum">{total} product{total === 1 ? "" : "s"}</p>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <div>

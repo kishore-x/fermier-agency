@@ -112,3 +112,22 @@ export function whatsappLink(number: string | null | undefined, text: string) {
   if (!n) return null;
   return `https://wa.me/${n}?text=${encodeURIComponent(text)}`;
 }
+
+export type CategoryDetail = {
+  id: string; name: string; slug: string; description: string | null; image_url: string | null; overview: string | null;
+  key_points: string[]; applications: string[]; buying_guide: { title: string; text: string }[]; faqs: { q: string; a: string }[];
+};
+
+/** Category landing-page content plus a spec comparison across every active product in it. */
+export async function getCategoryDetail(slug: string) {
+  const supabase = await createClient();
+  const { data: c } = await supabase.from("categories")
+    .select("id, name, slug, description, image_url, overview, key_points, applications, buying_guide, faqs").eq("slug", slug).eq("is_active", true).maybeSingle();
+  if (!c) return null;
+  const { data: prods } = await supabase.from("catalog_products").select("*").eq("category_slug", slug).order("featured_rank").order("name").limit(50);
+  const rows = await withCardSpecs((prods ?? []) as CatalogProduct[], 50);
+  const freq = new Map<string, number>();
+  rows.forEach((r) => r.specs.forEach((s) => freq.set(s.label, (freq.get(s.label) ?? 0) + 1)));
+  const columns = [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5).map(([l]) => l);
+  return { category: c as CategoryDetail, comparison: { columns, rows } };
+}

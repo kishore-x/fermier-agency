@@ -11,8 +11,10 @@ import { EditCategory } from "./edit-category";
 export default async function CategoriesPage() {
   await requireStaff("admin");
   const supabase = await createClient();
-  const { data } = await supabase.from("categories").select("id, name, slug, description, parent_id, sort_order, is_active, products!products_category_id_fkey(count)").order("sort_order").order("name");
-  const cats = (data ?? []) as unknown as { id: string; name: string; slug: string; description: string | null; parent_id: string | null; sort_order: number; is_active: boolean; products: { count: number }[] }[];
+  const { data } = await supabase.from("categories").select("id, name, slug, description, parent_id, sort_order, is_active, overview, key_points, applications, buying_guide, faqs, products!products_category_id_fkey(count)").order("sort_order").order("name");
+  type Cat = { id: string; name: string; slug: string; description: string | null; parent_id: string | null; sort_order: number; is_active: boolean; products: { count: number }[];
+    overview: string | null; key_points: string[]; applications: string[]; buying_guide: { title: string; text: string }[]; faqs: { q: string; a: string }[] };
+  const cats = (data ?? []) as unknown as Cat[];
   const top = cats.filter((c) => !c.parent_id);
   return (
     <div className="max-w-5xl">
@@ -47,7 +49,8 @@ export default async function CategoriesPage() {
 }
 
 function Row({ c, first, last, sub, parents }: {
-  c: { id: string; name: string; slug: string; description: string | null; parent_id: string | null; sort_order: number; is_active: boolean; products: { count: number }[] };
+  c: { id: string; name: string; slug: string; description: string | null; parent_id: string | null; sort_order: number; is_active: boolean; products: { count: number }[];
+    overview: string | null; key_points: string[]; applications: string[]; buying_guide: { title: string; text: string }[]; faqs: { q: string; a: string }[] };
   first?: boolean; last?: boolean; sub?: boolean; parents: { id: string; name: string }[];
 }) {
   return (

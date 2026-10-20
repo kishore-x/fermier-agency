@@ -22,12 +22,22 @@ export async function saveCategory(_: ActionState, fd: FormData): Promise<Action
   if (!p.success) return { error: p.error.issues[0].message };
   const id = str(fd.get("id"));
   if (id && p.data.parent_id === id) return { error: "A category cannot be its own parent." };
-  const row = { ...p.data, slug: p.data.slug || slugify(p.data.name), parent_id: p.data.parent_id || null, description: p.data.description || null };
+  const row: Record<string, unknown> = { ...p.data, slug: p.data.slug || slugify(p.data.name), parent_id: p.data.parent_id || null, description: p.data.description || null };
+  if (str(fd.get("with_content"))) {
+    const lines = (k: string) => str(fd.get(k)).split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 30);
+    const pairs = (k: string) => lines(k).map((l) => { const i = l.indexOf("|"); return i < 0 ? [l, ""] : [l.slice(0, i).trim(), l.slice(i + 1).trim()]; }).filter(([a]) => a);
+    row.overview = str(fd.get("overview")).slice(0, 8000) || null;
+    row.key_points = lines("key_points").map((l) => l.slice(0, 200));
+    row.applications = lines("applications").map((l) => l.slice(0, 120));
+    row.buying_guide = pairs("buying_guide").map(([title, text]) => ({ title: title.slice(0, 120), text: text.slice(0, 600) }));
+    row.faqs = pairs("faqs").map(([q, a]) => ({ q: q.slice(0, 200), a: a.slice(0, 1000) }));
+  }
   const supabase = await createClient();
   const { error } = id ? await supabase.from("categories").update(row).eq("id", id) : await supabase.from("categories").insert(row);
   if (error) return { error: friendlyError(error) };
   revalidatePath("/admin/categories");
   revalidatePath("/", "layout");
+  revalidatePath("/catalog/[category]", "page");
   return { ok: true, message: id ? "Category updated" : "Category added" };
 }
 

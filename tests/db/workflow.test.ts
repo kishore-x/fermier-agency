@@ -40,7 +40,7 @@ describe("seed", () => {
 
   it("anonymous visitors see catalog without purchase cost", async () => {
     const rows = await asUser(db, null, (tx) => tx.query<Record<string, unknown>>("select * from catalog_products"));
-    expect(rows.rows.length).toBe(24);
+    expect(rows.rows.length).toBe(27);
     expect(rows.rows[0]).not.toHaveProperty("purchase_cost");
     const onRequest = rows.rows.find((r) => r.sku === "YT-WN-1000")!;
     expect(onRequest.display_price).toBeNull();
@@ -281,7 +281,7 @@ describe("cost visibility and reports", () => {
     const asExec = await asUser(db, exec, (tx) => tx.query("select * from product_costs"));
     expect(asExec.rows).toHaveLength(0);
     const asInv = await asUser(db, inventory, (tx) => tx.query("select * from product_costs"));
-    expect(asInv.rows.length).toBe(24);
+    expect(asInv.rows.length).toBe(27);
   });
 
   it("dashboard hides stock value from sales roles", async () => {
