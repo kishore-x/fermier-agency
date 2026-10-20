@@ -300,3 +300,93 @@ insert into supplier_products (supplier_id, product_id, lead_time_days)
 select s.id, p.id, 14 from suppliers s, products p where s.supplier_code = 'SUP-DEMO-001' and p.sku like 'YT-%';
 insert into supplier_products (supplier_id, product_id, lead_time_days)
 select s.id, p.id, 30 from suppliers s, products p where s.supplier_code = 'SUP-DEMO-002' and p.sku like 'PM-%';
+
+-- ===== Rich product content (SAMPLE copy — verify against manufacturer datasheets before publishing) =====
+update products p set description = v.descr, features = v.feat, applications = v.app, in_the_box = v.box, warranty = v.warr
+from (values
+ ('WN-VP1550',
+  'The Wacker Neuson VP1550 is a single-direction vibratory plate compactor built for compacting granular soils, gravel and asphalt in confined areas. A 24 kN centrifugal force delivers deep, uniform compaction, while the low-vibration guide handle and integrated water tank make it suitable for both sub-base preparation and asphalt patch work. Its compact footprint lets it work close to kerbs, foundations and trench walls where rollers cannot reach. SAMPLE PRODUCT DATA.',
+  array['24 kN centrifugal force for deep, uniform compaction','Low hand-arm vibration guide handle for operator comfort','Integrated water sprinkler tank for asphalt work','Heavy-duty ductile base plate with rounded edges','Central lifting eye and transport wheel kit','Petrol engine with low-oil shutdown protection'],
+  array['Sub-base and backfill compaction','Interlocking paver bedding','Asphalt patch and repair work','Trench and foundation backfill','Landscaping and driveway preparation'],
+  array['VP1550 plate compactor','Water tank (10 L)','Guide handle assembly','Operator manual and tool kit'],
+  '12 months manufacturer warranty against manufacturing defects; engine covered by engine-maker warranty.'),
+ ('MS-MT36',
+  'The Masalta MT36 is a 36-inch walk-behind power trowel for floating and finishing concrete slabs. Pitch control lets the operator move from floating pans to finishing blades without stopping, and the centrifugal safety stop cuts drive the moment the handle is released. Ideal for warehouse floors, parking decks and industrial slabs. SAMPLE PRODUCT DATA.',
+  array['36" working diameter with four blades','Quick-pitch blade adjustment','Centrifugal safety stop switch','Foldable, height-adjustable handle','Balanced design for easy handling'],
+  array['Industrial and warehouse floors','Parking decks and podium slabs','Residential and commercial slabs','Floor hardener finishing'],
+  array['MT36 power trowel','Combination blades (set of 4)','Lifting hook','Operator manual'],
+  '12 months warranty on machine; engine as per engine manufacturer.'),
+ ('MS-MF14',
+  'The Masalta MF14 walk-behind floor saw cuts expansion joints and trenches in concrete and asphalt. A 14-inch blade, water-cooled cutting system and depth hand-wheel give clean, accurate cuts up to 125 mm deep. SAMPLE PRODUCT DATA.',
+  array['Up to 125 mm cutting depth','Water cooling with 25 L tank','Precision depth hand-wheel','Front pointer for straight cuts','Blade guard with lifting front'],
+  array['Expansion and control joints','Road and runway repair','Trenching for utilities','Concrete demolition preparation'],
+  array['MF14 floor saw','Water tank','Blade spanner','Operator manual'],
+  '12 months warranty on machine; blades are consumables.'),
+ ('JCB-G115QS',
+  'The JCB G115QS is a 115 kVA super-silent diesel generator in a weather-proof acoustic canopy, designed for continuous site power, events and standby duty. SAMPLE PRODUCT DATA.',
+  array['Super-silent acoustic canopy','Digital control panel with auto start','Integrated fuel tank for long run time','Bunded base to contain spills','Forklift pockets and lifting point'],
+  array['Construction site power','Standby power for commercial buildings','Events and temporary installations'],
+  array['Generator set','Battery and charger','Control panel keys','Operation and maintenance manual'],
+  '24 months or 3000 hours, whichever is earlier (sample terms).'),
+ ('AC-XAS186',
+  'The Atlas Copco XAS 186 is a towable diesel screw compressor delivering 186 CFM at 7 bar for pneumatic tools and sandblasting on site. SAMPLE PRODUCT DATA.',
+  array['186 CFM free air delivery at 7 bar','Reliable rotary screw element','Spillage-free frame','Easy-access service doors','Road-towable chassis'],
+  array['Pneumatic breakers and drills','Sandblasting','Pipeline testing','Construction and mining sites'],
+  array['XAS 186 compressor','Tow bar and lights','Operator manual'],
+  '12 months warranty (sample terms).'),
+ ('GN-MLT4060',
+  'The Generac MLT4060 mobile lighting tower provides 4 x 1000 W equivalent LED illumination on a 9 m hydraulic mast for night work and large-area lighting. SAMPLE PRODUCT DATA.',
+  array['4 x high-output LED lamps','9 m hydraulic mast','Long run time on a single tank','Outriggers for stability','Road-towable trailer'],
+  array['Night-time construction','Road works','Mining and quarry sites','Events and emergency response'],
+  array['Lighting tower','Outrigger pins','Operator manual'],
+  '12 months warranty (sample terms).'),
+ ('YT-WN-500E',
+  'The Y-tal 500 kg Winch Eco Model is a single-phase construction winch for lifting bricks, cement bags, steel and other building materials to upper floors. Paired with the Y-tal mini crane frame it forms a complete rooftop material hoist. SAMPLE PRODUCT DATA.',
+  array['500 kg lifting capacity','Runs on 220 V single-phase supply','40 m lifting height with 8 mm wire rope','Mechanical brake with pendant remote','Rope guide and voltage meter on remote'],
+  array['Residential and small commercial construction','Lifting cement, bricks, sand and steel','Rooftop material hoisting with mini crane'],
+  array['Winch with drum and motor','40 m wire rope (8 mm)','Pendant remote','Mounting bolts'],
+  '12 months warranty on motor and gearbox; wire rope is a consumable.'),
+ ('YT-WN-500P',
+  'The Y-tal 500 kg Winch Plus Model adds a copper-wound 3 HP motor, electromagnetic brake and limit switch for continuous, heavy site duty with a 60 m rope capacity. SAMPLE PRODUCT DATA.',
+  array['3 HP copper-wound motor','Electromagnetic brake for instant hold','Upper limit switch for safety','60 m rope capacity','Rope guide with voltage meter'],
+  array['Multi-storey residential projects','Continuous material lifting','Rooftop hoisting with mini crane frame'],
+  array['Winch with drum and motor','60 m wire rope (8 mm)','Pendant remote with voltage meter','Mounting bolts'],
+  '12 months warranty on motor and gearbox; wire rope is a consumable.'),
+ ('YT-MC-FR01',
+  'The Y-tal mini crane frame is a rooftop swivel frame that pairs with Y-tal 500 kg winches to form a complete material hoist. SAMPLE PRODUCT DATA.',
+  array['Heavy MS fabricated frame','180° to 360° swivel boom','Counterweight tray','Compatible with Eco and Plus winches'],
+  array['Rooftop material lifting','Building renovation and repair'],
+  array['Frame, boom and swivel base','Counterweight tray','Fasteners'],
+  '6 months warranty against fabrication defects.')
+) as v(sku, descr, feat, app, box, warr)
+where p.sku = v.sku;
+
+-- Fuller spec sheets for the reference-design machines
+delete from product_specifications where product_id in (select id from products where sku in ('WN-VP1550','MS-MT36','MS-MF14'));
+insert into product_specifications (product_id, spec_group, label, value, sort_order)
+select p.id, s.grp, s.label, s.value, s.ord from products p join (values
+ ('WN-VP1550','Overview','Type','Plate Compactor',0),
+ ('WN-VP1550','Performance','Centrifugal force','24 kN',1),('WN-VP1550','Performance','Vibration frequency','98 Hz',2),
+ ('WN-VP1550','Performance','Travel speed','25 m/min',3),('WN-VP1550','Performance','Area capacity','750 m²/h',4),
+ ('WN-VP1550','Performance','Compaction depth','up to 30 cm',5),
+ ('WN-VP1550','Engine','Engine','Honda GX160 (or equivalent)',6),('WN-VP1550','Engine','Power','5.5 HP',7),
+ ('WN-VP1550','Engine','Fuel','Petrol',8),('WN-VP1550','Engine','Fuel tank','3.6 L',9),('WN-VP1550','Engine','Water tank','10 L',10),
+ ('WN-VP1550','Dimensions','Plate size (L x W)','585 x 500 mm',11),('WN-VP1550','Dimensions','Operating weight','86 kg',12),
+ ('MS-MT36','Overview','Type','Power Trowel',0),('MS-MT36','Performance','Trowel diameter','36"',1),('MS-MT36','Performance','Blades','4',2),
+ ('MS-MT36','Performance','Rotor speed','70–140 rpm',3),('MS-MT36','Engine','Engine power','6.5 HP',4),('MS-MT36','Engine','Fuel','Petrol',5),
+ ('MS-MT36','Dimensions','Operating weight','80 kg',6),
+ ('MS-MF14','Overview','Type','Concrete Cutter',0),('MS-MF14','Performance','Blade diameter','14"',1),('MS-MF14','Engine','Engine power','13 HP',2),
+ ('MS-MF14','Performance','Max cutting depth','125 mm',3),('MS-MF14','Performance','Water tank','25 L',4),('MS-MF14','Engine','Fuel','Petrol',5),
+ ('MS-MF14','Dimensions','Operating weight','92 kg',6)
+) as s(sku, grp, label, value, ord) on s.sku = p.sku;
+-- Brand / model shown on the card spec sheet come from the product itself; add voltage-style rows for winches
+
+-- Machine type shown on the product card header strip
+insert into product_specifications (product_id, spec_group, label, value, sort_order)
+select p.id, 'Overview', 'Type', v.t, 0 from products p join (values
+ ('YT-WN-500E','Mini Crane Winch'),('YT-WN-500P','Mini Crane Winch'),('YT-WN-1000','Construction Winch'),('YT-MC-FR01','Mini Crane Frame'),
+ ('FP-PW-2200','Pressure Washer'),('FP-PW-3000','Pressure Washer'),('AK-PWD-7HP','Power Weeder'),('AK-BC-52','Brush Cutter'),
+ ('AT-AC-100L','Air Compressor'),('AT-AC-24L','Air Compressor'),('PM-GEN-3K','Generator'),('PM-GEN-7K','Generator'),
+ ('FP-PT-2000','Electric Stacker'),('FP-VC-30L','Wet & Dry Vacuum'),('AK-FG-TH','Thermal Fogger'),('PM-WM-200','Welding Machine'),
+ ('PM-DB-1500','Rotary Hammer'),('PM-AG-4','Angle Grinder')
+) as v(sku, t) on v.sku = p.sku;

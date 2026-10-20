@@ -42,8 +42,14 @@ export async function saveProduct(_: ActionState, fd: FormData): Promise<ActionS
     p_cost: purchase_cost ? Number(purchase_cost) : null, p_set_cost: can.viewCost(session),
   });
   if (error) return { error: friendlyError(error) };
+  const lines = (k: string) => str(fd.get(k)).split("\n").map((l) => l.trim()).filter(Boolean).slice(0, 30).map((l) => l.slice(0, 200));
+  const { error: cErr } = await supabase.from("products").update({
+    features: lines("features"), applications: lines("applications"), in_the_box: lines("in_the_box"), warranty: str(fd.get("warranty")).slice(0, 500) || null,
+  }).eq("id", data as string);
+  if (cErr) return { error: friendlyError(cErr) };
   revalidatePath("/admin/products");
   revalidatePath("/catalog", "layout");
+  revalidatePath("/products/[slug]", "page");
   if (!id) redirect(`/admin/products/${data}?created=1`);
   return { ok: true, message: "Product saved" };
 }

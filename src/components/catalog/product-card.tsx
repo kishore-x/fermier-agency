@@ -1,40 +1,61 @@
 import Link from "next/link";
-import type { CatalogProduct } from "@/lib/queries/catalog";
+import type { CatalogCardProduct } from "@/lib/queries/catalog";
+import { whatsappLink } from "@/lib/queries/catalog";
 import { formatMoney } from "@/lib/utils";
-import { CategoryIcon as CategoryIconLazy, ProductImage } from "./category-icon";
 import { AddToCartButton } from "./add-to-cart";
+import { CategoryIcon as CategoryIconLazy, ProductImage } from "./category-icon";
+import { WhatsAppIcon } from "./whatsapp-icon";
 
-export function ProductCard({ p }: { p: CatalogProduct }) {
+/** Spec-sheet style product card: rating strip, photo, key specification rows, code, price and enquiry actions. */
+export function ProductCard({ p, whatsapp }: { p: CatalogCardProduct; whatsapp?: string | null }) {
   const available = Number(p.available_qty);
+  const ratings = p.specs.slice(0, 2).map((s) => s.value);
+  const rows: { label: string; value: string }[] = [
+    ...(p.brand_name ? [{ label: "Brand", value: p.brand_name }] : []),
+    ...(p.model_number ? [{ label: "Model", value: p.model_number }] : []),
+    ...p.specs,
+  ].slice(0, 7);
+  const wa = whatsappLink(whatsapp, `Hello, I'd like a quote for ${p.name} (Code: ${p.sku}).`);
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg border border-line bg-white shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-shadow hover:shadow-md">
-      <Link href={`/products/${p.slug}`} className="relative block aspect-square border-b border-line bg-white p-3">
-        <ProductImage src={p.image_url} alt={p.name} categorySlug={p.category_slug} />
-        {p.is_featured && (
-          <span className="absolute left-2 top-2 rounded bg-navy px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">Featured</span>
+    <div className="group flex flex-col overflow-hidden rounded-md border border-[#dde5ee] bg-white shadow-[0_1px_3px_rgba(14,27,44,0.06)] transition-shadow hover:shadow-lg">
+      <Link href={`/products/${p.slug}`} className="flex min-h-[46px] items-center justify-between gap-2 bg-[#20244f] px-3 py-1.5 text-white">
+        <span className="font-display text-[12.5px] font-bold uppercase leading-tight">{ratings.map((r) => <span key={r} className="block">{r}</span>)}</span>
+        <span className="text-right font-display text-[13px] font-bold uppercase leading-tight">{p.type ?? p.category_name}</span>
+      </Link>
+      <Link href={`/products/${p.slug}`} className="relative block bg-gradient-to-br from-white via-white to-[#eef2f7] px-3 pb-2 pt-3">
+        <div className="flex items-start justify-between gap-2 text-[10px] font-bold uppercase leading-tight text-ink-900">
+          <span>{p.sku}{p.model_number ? <><br />▸ {p.model_number}</> : null}</span>
+          {p.is_featured && <span className="rounded bg-brand px-1.5 py-0.5 text-[9px] text-white">Featured</span>}
+        </div>
+        <div className="mx-auto mt-1 flex h-[130px] items-center justify-center">
+          <ProductImage src={p.image_url} alt={p.name} categorySlug={p.category_slug} />
+        </div>
+        {rows.length > 0 && (
+          <dl className="mx-auto mt-2 grid max-w-[230px] grid-cols-[auto_auto_1fr] gap-x-1.5 text-[10.5px] leading-[1.45] text-ink-900">
+            {rows.map((r) => (
+              <div key={r.label} className="contents">
+                <dt className="font-semibold">{r.label}</dt><dd className="text-muted">:</dd><dd className="truncate" title={r.value}>{r.value}</dd>
+              </div>
+            ))}
+          </dl>
         )}
       </Link>
-      <div className="flex flex-1 flex-col p-3">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-muted">{p.brand_name ?? "—"} · {p.sku}</p>
-        <Link href={`/products/${p.slug}`} className="mt-1 line-clamp-2 text-sm font-semibold leading-snug text-ink hover:text-navy">
-          {p.name}
-        </Link>
-        {p.model_number && <p className="mt-0.5 text-xs text-muted">Model {p.model_number}</p>}
-        <div className="mt-auto pt-3">
-          <div className="flex items-baseline justify-between gap-2">
-            {p.display_price ? (
-              <span className="text-base font-semibold text-ink tnum">{formatMoney(p.display_price)}</span>
-            ) : (
-              <span className="text-sm font-medium text-navy">Price on request</span>
-            )}
-            <span className={available > 0 ? "text-xs text-ok-600" : "text-xs text-muted"}>
-              {available > 0 ? "In stock" : "On order"}
-            </span>
-          </div>
-          {p.display_price && <p className="text-[11px] text-muted">+ GST {Number(p.tax_rate)}%</p>}
-          <AddToCartButton product={p} className="mt-3 w-full" compact />
+      <div className="flex flex-1 flex-col border-t border-line px-3 pb-3 pt-2.5">
+        <Link href={`/products/${p.slug}`} className="line-clamp-2 text-[14px] font-semibold leading-snug text-ink-900 hover:text-brand">{p.name}</Link>
+        <p className="mt-0.5 text-xs text-muted">Code: {p.sku}</p>
+        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+          <span className={available > 0 ? "text-[11px] font-medium text-ok-600" : "text-[11px] font-medium text-amber-700"}>{available > 0 ? "In stock" : "On order"}</span>
+          {p.display_price
+            ? <span className="text-right"><span className="block text-lg font-bold text-ink-900 tnum">{formatMoney(p.display_price).replace(/\.00$/, "")}</span><span className="block text-[10px] text-muted">+ GST {Number(p.tax_rate)}%</span></span>
+            : <span className="text-sm font-semibold text-brand">Price on request</span>}
         </div>
+        <AddToCartButton product={p} compact className="mt-2.5 w-full" />
       </div>
+      {wa && (
+        <a href={wa} target="_blank" rel="noopener noreferrer" className="flex h-9 items-center justify-center gap-2 bg-[#25D366] text-[13px] font-semibold text-white hover:bg-[#1fb757]">
+          <WhatsAppIcon className="h-4 w-4" /> Send Enquiry
+        </a>
+      )}
     </div>
   );
 }

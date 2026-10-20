@@ -88,3 +88,51 @@ export async function markMyNotificationsRead(): Promise<ActionState> {
   revalidatePath("/portal", "layout");
   return { ok: true };
 }
+
+export type DirectPoResult = (NonNullable<ActionState> & { poNumber?: string; reference?: string; enquiryId?: string }) | null;
+
+const PO_FILE_TYPES = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+
+/** Customer raises a purchase order straight from a product page. Staff are notified and quote/confirm it. */
+export async function raiseDirectPo(_: DirectPoResult, fd: FormData): Promise<DirectPoResult> {
+  const session = await requireCustomer();
+  if (!(await rateLimit("direct-po", 10, 60 * 60_000))) return { error: "Too many purchase orders submitted. Please try again later." };
+  const schema = z.object({
+    product_id: z.string().uuid(),
+    quantity: z.coerce.number().int("Quantity must be a whole number").min(1, "Quantity must be at least 1").max(9999),
+    po_number: z.string().trim().min(1, "Enter your PO number").max(60),
+    po_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter the PO date"),
+    po_amount: z.string().regex(/^\d{1,12}(\.\d{1,2})?$/, "Enter the PO amount (numbers only)").refine((v) => Number(v) > 0, "PO amount must be greater than zero"),
+    delivery_address: z.string().trim().min(5, "Enter the delivery address").max(500),
+    requested_date: z.string().regex(/^$|^\d{4}-\d{2}-\d{2}$/),
+    notes: z.string().max(2000),
+  });
+  const p = schema.safeParse({
+    product_id: str(fd.get("product_id")), quantity: str(fd.get("quantity")), po_number: str(fd.get("po_number")), po_date: str(fd.get("po_date")),
+    po_amount: str(fd.get("po_amount")), delivery_address: str(fd.get("delivery_address")), requested_date: str(fd.get("requested_date")), notes: str(fd.get("notes")),
+  });
+  if (!p.success) return { error: "Please fix the highlighted fields.", fieldErrors: Object.fromEntries(p.error.issues.map((i) => [String(i.path[0]), i.message])) };
+  const v = p.data;
+  const file = fd.get("file");
+  if (!(file instanceof File) || !file.size) return { error: "Attach your purchase order document.", fieldErrors: { file: "Required" } };
+  if (!PO_FILE_TYPES.includes(file.type)) return { error: "PO must be a PDF, JPG, PNG or WebP file.", fieldErrors: { file: "Unsupported file type" } };
+  if (file.size > 10 * 1024 * 1024) return { error: "PO file must be under 10 MB.", fieldErrors: { file: "Max 10 MB" } };
+
+  const supabase = await createClient();
+  const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, "_").slice(-80);
+  const path = `${session.customerId}/purchase-orders/${crypto.randomUUID()}-${safeName}`;
+  const { error: upErr } = await supabase.storage.from("customer-documents").upload(path, file, { contentType: file.type, upsert: false });
+  if (upErr) return { error: `Upload failed: ${upErr.message}` };
+  const { data, error } = await supabase.rpc("submit_direct_po", {
+    p_product: v.product_id, p_quantity: v.quantity, p_po_number: v.po_number, p_po_date: v.po_date, p_amount: Number(v.po_amount),
+    p_delivery_address: v.delivery_address, p_requested_date: v.requested_date || null, p_notes: v.notes || null,
+    p_storage_path: path, p_file_name: file.name.slice(0, 200),
+  });
+  if (error) {
+    await supabase.storage.from("customer-documents").remove([path]);
+    return { error: friendlyError(error) };
+  }
+  const row = (data as { po_id: string; enquiry_id: string; enquiry_number: string }[])[0];
+  revalidatePath("/portal", "layout");
+  return { ok: true, poNumber: v.po_number, reference: row.enquiry_number, enquiryId: row.enquiry_id };
+}

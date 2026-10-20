@@ -10,6 +10,22 @@ export type CatalogProduct = {
   available_qty: string; image_url: string | null; is_featured: boolean; is_sample_data: boolean; featured_rank?: number;
 };
 
+export type CardSpec = { label: string; value: string };
+export type CatalogCardProduct = CatalogProduct & { type: string | null; specs: CardSpec[] };
+
+/** Adds the product "Type" and its first spec rows, for spec-sheet style product cards. */
+export async function withCardSpecs(rows: CatalogProduct[], limit = 6): Promise<CatalogCardProduct[]> {
+  if (!rows.length) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.from("product_specifications").select("product_id, label, value, sort_order")
+    .in("product_id", rows.map((r) => r.id)).order("sort_order");
+  return rows.map((r) => {
+    const mine = (data ?? []).filter((x) => x.product_id === r.id);
+    return { ...r, type: mine.find((x) => x.label === "Type")?.value ?? null,
+      specs: mine.filter((x) => x.label !== "Type").slice(0, limit).map((x) => ({ label: x.label, value: x.value })) };
+  });
+}
+
 export type CatalogFilters = {
   q?: string; category?: string; brand?: string; availability?: string; sort?: string; min?: string; max?: string; page?: string; focus?: string;
 };
@@ -34,7 +50,7 @@ export async function listCatalog(f: CatalogFilters, pageSize = PAGE_SIZE) {
   }
   const { data, count, error } = await q.range(from, to);
   if (error) throw error;
-  return { rows: (data ?? []) as CatalogProduct[], total: count ?? 0, page, pageSize };
+  return { rows: await withCardSpecs((data ?? []) as CatalogProduct[]), total: count ?? 0, page, pageSize };
 }
 
 export const getCategories = cache(async () => {
@@ -74,8 +90,9 @@ export async function getProductBySlug(slug: string) {
     supabase.from("catalog_products").select("*").eq("category_slug", p.category_slug).neq("id", p.id).limit(4),
   ]);
   return {
-    product: p as CatalogProduct & { description: string | null; manufacturer: string | null },
-    images: images ?? [], specs: specs ?? [], docs: docs ?? [], related: (related ?? []) as CatalogProduct[],
+    product: p as CatalogProduct & { description: string | null; manufacturer: string | null; features: string[]; applications: string[];
+      in_the_box: string[]; warranty: string | null; hsn_code: string | null },
+    images: images ?? [], specs: specs ?? [], docs: docs ?? [], related: await withCardSpecs((related ?? []) as CatalogProduct[]),
   };
 }
 

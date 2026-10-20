@@ -127,3 +127,14 @@ export async function createInvoiceNow(_: ActionState, fd: FormData): Promise<Ac
   revalidatePath("/admin/invoices");
   return res.ok ? { ok: true, message: res.message } : { error: res.message };
 }
+
+export async function linkPoToQuotation(_: ActionState, fd: FormData): Promise<ActionState> {
+  await requireStaff("admin", "sales_manager", "sales_executive");
+  const id = str(fd.get("id"));
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("link_po_to_quotation", { p_po: id, p_quotation: str(fd.get("quotation_id")) });
+  if (error) return { error: friendlyError(error) };
+  revalidatePath(`/admin/purchase-orders/${id}`);
+  revalidatePath("/admin/purchase-orders");
+  return { ok: true, message: "PO linked to the accepted quotation — you can verify it now" };
+}

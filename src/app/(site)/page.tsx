@@ -65,7 +65,7 @@ export default async function HomePage() {
       </section>
 
       {/* About + brands */}
-      <section className="container-site grid items-center gap-8 py-6 lg:grid-cols-[minmax(240px,340px)_1fr_1px_minmax(440px,620px)] xl:gap-12">
+      <section className="container-site grid items-center gap-8 py-6 lg:grid-cols-[minmax(200px,300px)_minmax(0,1.15fr)_1px_minmax(0,1fr)] xl:gap-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/site/about.jpg" alt="Operator finishing a concrete floor with a power trowel" className="h-[170px] w-full rounded-sm object-cover shadow-md 2xl:h-[210px]" />
         <div>

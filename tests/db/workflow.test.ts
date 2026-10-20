@@ -361,3 +361,37 @@ describe("profile privilege guard", () => {
     expect(Number(n.n)).toBeGreaterThan(0);
   });
 });
+
+describe("direct purchase order from product page", () => {
+  it("customer raises a PO, admin is notified, and it must be linked to an accepted quotation before verification", async () => {
+    const pid = await productId("PM-WM-200");
+    const custId = (await one<{ id: string }>(db, "select id from customers where customer_code='CUS-DEMO-001'")).id;
+    await expect(asUser(db, custA, (tx) => tx.query("select * from submit_direct_po($1, 2, 'PO-D-1', current_date, 30208, 'Site', null, null, null, null)", [pid])))
+      .rejects.toThrow(/Attach your purchase order/);
+    await expect(asUser(db, custA, (tx) => tx.query("select * from submit_direct_po($1, 2, 'PO-D-1', current_date, 30208, 'Site', null, null, $2, 'po.pdf')", [pid, `someone-else/purchase-orders/x.pdf`])))
+      .rejects.toThrow(/Attach your purchase order/);
+    const r = await asUser(db, custA, (tx) => one<{ po_id: string; enquiry_id: string; enquiry_number: string }>(tx,
+      "select * from submit_direct_po($1, 2, 'PO-D-1', current_date, 30208, 'Demo site', null, 'urgent', $2, 'po.pdf')", [pid, `${custId}/purchase-orders/d.pdf`]));
+    const n = await one<{ n: string }>(db, "select count(*) n from notifications where event_type = 'customer_po.received' and link = $1", [`/admin/purchase-orders/${r.po_id}`]);
+    expect(Number(n.n)).toBeGreaterThan(0);
+    const enq = await one<{ source: string }>(db, "select source from enquiries where id = $1", [r.enquiry_id]);
+    expect(enq.source).toBe("purchase_order");
+    // customer B cannot see it
+    expect((await asUser(db, custB, (tx) => tx.query("select * from customer_purchase_orders where id = $1", [r.po_id]))).rows).toHaveLength(0);
+
+    await expect(asUser(db, manager, (tx) => tx.query("select verify_customer_po($1, null)", [r.po_id]))).rejects.toThrow(/Link this direct PO/);
+
+    // staff quote the request, customer accepts, staff link, verify, confirm
+    const qid = await asUser(db, exec, async (tx) => (await one<{ save_quotation: string }>(tx, "select save_quotation(null, $1, $2)",
+      [JSON.stringify({ customer_id: custId, enquiry_id: r.enquiry_id }), JSON.stringify([{ product_id: pid, quantity: 2 }])])).save_quotation);
+    const q = await one<{ grand_total: string }>(db, "select grand_total from quotations where id=$1", [qid]);
+    expect(q.grand_total).toBe("30208.00"); // 2 x 12800 + 18% GST
+    await asUser(db, exec, async (tx) => { await tx.query("select transition_quotation($1,'submit')", [qid]); await tx.query("select transition_quotation($1,'mark_sent')", [qid]); });
+    await asUser(db, custA, (tx) => tx.query("select customer_respond_quotation($1, true)", [qid]));
+    await asUser(db, exec, (tx) => tx.query("select link_po_to_quotation($1, $2)", [r.po_id, qid]));
+    const issues = await asUser(db, manager, (tx) => one<{ verify_customer_po: string[] }>(tx, "select verify_customer_po($1, null)", [r.po_id]));
+    expect(issues.verify_customer_po).toEqual([]);
+    const so = await asUser(db, manager, (tx) => one<{ convert_quotation_to_order: string }>(tx, "select convert_quotation_to_order($1,$2)", [qid, r.po_id]));
+    expect(so.convert_quotation_to_order).toBeTruthy();
+  });
+});

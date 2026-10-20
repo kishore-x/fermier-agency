@@ -12,6 +12,7 @@ export type ProductFormValues = {
   subcategory_id?: string | null; model_number?: string | null; short_description?: string | null; description?: string | null; unit?: string;
   selling_price?: string | null; purchase_cost?: string | null; tax_rate?: string; hsn_code?: string | null; price_visibility?: string;
   reorder_threshold?: string; is_featured?: boolean; status?: string;
+  features?: string[]; applications?: string[]; in_the_box?: string[]; warranty?: string | null;
   specs?: { spec_group: string; label: string; value: string }[];
 };
 
@@ -37,6 +38,13 @@ export function ProductForm({ values = {}, categories, brands, showCost, readOnl
               <Field label="URL slug" name="slug" error={e.slug} hint="Leave blank to generate from name + SKU"><Input id="slug" name="slug" defaultValue={v("slug")} /></Field>
               <Field label="Short description" name="short_description" className="sm:col-span-2" error={e.short_description}><Input id="short_description" name="short_description" defaultValue={v("short_description")} maxLength={300} /></Field>
               <Field label="Full description" name="description" className="sm:col-span-2"><Textarea id="description" name="description" defaultValue={v("description")} rows={5} /></Field>
+            </FormSection>
+
+            <FormSection title="Product page content" description="Shown on the public product page. One item per line.">
+              <Field label="Key features" name="features" className="sm:col-span-2"><Textarea id="features" name="features" rows={5} defaultValue={(values.features ?? []).join("\n")} placeholder={"24 kN centrifugal force\nLow-vibration handle"} /></Field>
+              <Field label="Applications" name="applications"><Textarea id="applications" name="applications" rows={4} defaultValue={(values.applications ?? []).join("\n")} /></Field>
+              <Field label="What's in the box" name="in_the_box"><Textarea id="in_the_box" name="in_the_box" rows={4} defaultValue={(values.in_the_box ?? []).join("\n")} /></Field>
+              <Field label="Warranty" name="warranty" className="sm:col-span-2"><Input id="warranty" name="warranty" defaultValue={values.warranty ?? ""} maxLength={500} /></Field>
             </FormSection>
 
             <FormSection title="2. Classification">

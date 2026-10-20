@@ -3,7 +3,7 @@ import { PackageSearch, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "./product-card";
 import { Pagination } from "@/components/ui/data";
 import { EmptyState, LinkButton } from "@/components/ui/primitives";
-import { type CatalogFilters, getBrands, getCategories, listCatalog } from "@/lib/queries/catalog";
+import { type CatalogFilters, getBrands, getCategories, getCompany, listCatalog } from "@/lib/queries/catalog";
 import { cn } from "@/lib/utils";
 
 const SORTS: [string, string][] = [["featured", "Featured"], ["name", "Name A–Z"], ["price_asc", "Price: low to high"], ["price_desc", "Price: high to low"], ["newest", "Newest"]];
@@ -11,9 +11,9 @@ const SORTS: [string, string][] = [["featured", "Featured"], ["name", "Name A–
 export async function CatalogView({ filters, basePath, title, lockedCategory }: {
   filters: CatalogFilters; basePath: string; title: string; lockedCategory?: string;
 }) {
-  const [{ rows, total, page, pageSize }, categories, brands] = await Promise.all([
+  const [{ rows, total, page, pageSize }, categories, brands, company] = await Promise.all([
     listCatalog({ ...filters, category: lockedCategory ?? filters.category }, 24),
-    getCategories(), getBrands(),
+    getCategories(), getBrands(), getCompany(),
   ]);
   const active = Object.entries({ q: filters.q, category: lockedCategory ? undefined : filters.category, brand: filters.brand,
     availability: filters.availability, min: filters.min, max: filters.max }).filter(([, v]) => v);
@@ -105,7 +105,7 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
           {rows.length ? (
             <div className="overflow-hidden rounded-lg border border-line bg-white">
               <div className={cn("grid grid-cols-2 gap-3 p-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5")}>
-                {rows.map((p) => <ProductCard key={p.id} p={p} />)}
+                {rows.map((p) => <ProductCard key={p.id} p={p} whatsapp={company?.whatsapp_number} />)}
               </div>
               <Pagination page={page} total={total} pageSize={pageSize} basePath={basePath}
                 params={{ ...filters, focus: undefined } as Record<string, string | undefined>} />
