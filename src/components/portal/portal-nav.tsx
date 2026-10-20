@@ -13,7 +13,7 @@ const ITEMS = [
 export function PortalNav({ unread }: { unread: number }) {
   const path = usePathname();
   return (
-    <nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-2" aria-label="Customer portal">
+    <nav className="container-site flex gap-1 overflow-x-auto" aria-label="Customer portal">
       {ITEMS.map(([href, label]) => {
         const active = href === "/portal" ? path === "/portal" : path.startsWith(href);
         return (

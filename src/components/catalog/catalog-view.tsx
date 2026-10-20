@@ -29,7 +29,7 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
     : k === "availability" ? "In stock only" : k === "min" ? `Min ₹${v}` : k === "max" ? `Max ₹${v}` : `“${v}”`;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <div className="container-site py-6">
       <nav className="mb-2 text-xs text-muted"><Link href="/" className="hover:text-ink">Home</Link> / <Link href="/catalog" className="hover:text-ink">Catalog</Link>{lockedCategory && <> / {title}</>}</nav>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
@@ -38,7 +38,7 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <div>
         <input type="checkbox" id="filters-toggle" className="peer sr-only" />
         <label htmlFor="filters-toggle" className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-line bg-white text-sm font-medium lg:hidden">
@@ -104,7 +104,7 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
           )}
           {rows.length ? (
             <div className="overflow-hidden rounded-lg border border-line bg-white">
-              <div className={cn("grid grid-cols-2 gap-3 p-3 md:grid-cols-3 xl:grid-cols-4")}>
+              <div className={cn("grid grid-cols-2 gap-3 p-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5")}>
                 {rows.map((p) => <ProductCard key={p.id} p={p} />)}
               </div>
               <Pagination page={page} total={total} pageSize={pageSize} basePath={basePath}

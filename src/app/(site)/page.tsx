@@ -28,7 +28,7 @@ export default async function HomePage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/site/hero.jpg" alt="Power trowel on a concrete site floor"
           className="pointer-events-none absolute left-1/2 top-0 h-full w-auto max-w-none -translate-x-[30%] opacity-35 [mask-image:linear-gradient(90deg,transparent,black_14%,black_86%,transparent)] md:-translate-x-[38%] md:opacity-100" />
-        <div className="relative mx-auto flex min-h-[250px] max-w-[1200px] items-center px-4 py-7">
+        <div className="container-site relative flex min-h-[250px] items-center py-7">
           <div className="max-w-[420px]">
             <Eyebrow className="text-[#3a95f7]">{SITE.hero.eyebrow}</Eyebrow>
             <h1 className="mt-2 font-display text-[36px] font-bold leading-[1.06] tracking-tight">
@@ -50,7 +50,7 @@ export default async function HomePage() {
 
       {/* Stats */}
       <section className="bg-charcoal text-white">
-        <ul className="mx-auto grid max-w-[1200px] grid-cols-2 px-4 md:grid-cols-4">
+        <ul className="container-site grid grid-cols-2 md:grid-cols-4">
           {SITE.stats.map((s, i) => {
             const I = STAT_ICON[s.icon as keyof typeof STAT_ICON];
             return (
@@ -65,9 +65,9 @@ export default async function HomePage() {
       </section>
 
       {/* About + brands */}
-      <section className="mx-auto grid max-w-[1200px] items-center gap-8 px-4 py-6 lg:grid-cols-[250px_1fr_1px_480px]">
+      <section className="container-site grid items-center gap-8 py-6 lg:grid-cols-[minmax(240px,340px)_1fr_1px_minmax(440px,620px)] xl:gap-12">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/site/about.jpg" alt="Operator finishing a concrete floor with a power trowel" className="h-[170px] w-full rounded-sm object-cover shadow-md" />
+        <img src="/site/about.jpg" alt="Operator finishing a concrete floor with a power trowel" className="h-[170px] w-full rounded-sm object-cover shadow-md 2xl:h-[210px]" />
         <div>
           <Eyebrow>About us</Eyebrow>
           <Heading className="mt-2">{SITE.about.title.map((t) => <span key={t} className="block">{t}</span>)}</Heading>
@@ -82,7 +82,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-3">
             {logoBrands.map((b, i) => (
               <Link key={b.id} href={`/catalog?brand=${b.slug}`} title={b.name}
-                className={`flex h-[66px] items-center justify-center px-3 transition-opacity hover:opacity-80 ${i % 3 !== 2 ? "border-r border-line" : ""} ${i < 3 ? "border-b border-line" : ""}`}>
+                className={`flex h-[66px] items-center justify-center px-3 2xl:h-[80px] transition-opacity hover:opacity-80 ${i % 3 !== 2 ? "border-r border-line" : ""} ${i < 3 ? "border-b border-line" : ""}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={b.logo_url!} alt={b.name} className="max-h-[52px] max-w-full object-contain" />
               </Link>
@@ -93,7 +93,7 @@ export default async function HomePage() {
 
       {/* Why choose us */}
       <section className="bg-band">
-        <div className="mx-auto grid max-w-[1200px] gap-5 px-4 py-6 lg:grid-cols-[210px_1fr] lg:items-center">
+        <div className="container-site grid gap-5 py-6 lg:grid-cols-[210px_1fr] lg:items-center">
           <div><Eyebrow>Why choose us</Eyebrow><Heading className="mt-1.5">Precision meets reliability</Heading></div>
           <div className="grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-6">
             {SITE.reasons.map((r) => {
@@ -111,14 +111,14 @@ export default async function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="mx-auto grid max-w-[1200px] gap-5 px-4 py-5 lg:grid-cols-[150px_1fr]">
+      <section className="container-site grid gap-5 py-5 lg:grid-cols-[150px_1fr]">
         <div className="lg:pt-6"><Eyebrow>Explore our range</Eyebrow><Heading className="mt-1.5">Equipment categories</Heading></div>
         <div>
           <div className="mb-1.5 flex justify-end"><ViewAll href="/categories">View all categories</ViewAll></div>
           <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 xl:grid-cols-8">
             {categories.slice(0, 8).map((c) => (
               <Link key={c.id} href={`/catalog/${c.slug}`} className="group flex flex-col rounded-sm border border-[#e3e8ef] bg-white p-3 shadow-[0_1px_2px_rgba(14,27,44,0.05)] transition-shadow hover:shadow-md">
-                <div className="flex h-[78px] items-center justify-center">
+                <div className="flex h-[78px] items-center justify-center 2xl:h-[96px]">
                   {c.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={c.image_url} alt="" className="max-h-full max-w-full object-contain" />
@@ -136,7 +136,7 @@ export default async function HomePage() {
 
       {/* Featured machinery */}
       <section className="bg-band">
-        <div className="mx-auto grid max-w-[1200px] gap-5 px-4 py-5 lg:grid-cols-[170px_1fr]">
+        <div className="container-site grid gap-5 py-5 lg:grid-cols-[170px_1fr]">
           <div className="lg:pt-6"><Eyebrow>Featured machinery</Eyebrow><p className="mt-2 text-[14px] leading-snug text-[#3d4652]">Popular models from trusted international brands.</p></div>
           <div>
             <div className="mb-1.5 flex justify-end"><ViewAll href="/catalog?sort=featured">View all products</ViewAll></div>
@@ -148,7 +148,7 @@ export default async function HomePage() {
       </section>
 
       {/* Clients */}
-      <section className="mx-auto grid max-w-[1200px] gap-5 px-4 py-5 lg:grid-cols-[250px_1fr] lg:items-center">
+      <section className="container-site grid gap-5 py-5 lg:grid-cols-[250px_1fr] lg:items-center">
         <div>
           <Eyebrow>Our clients</Eyebrow>
           <Heading className="mt-1.5">Trusted by industry leaders</Heading>
@@ -173,7 +173,7 @@ export default async function HomePage() {
         <img src="/site/cta-left.jpg" alt="" className="absolute inset-y-0 left-0 hidden h-full w-[36%] object-cover [mask-image:linear-gradient(90deg,black_70%,transparent)] md:block" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/site/cta-right.jpg" alt="" className="absolute inset-y-0 right-0 hidden h-full w-[29%] object-cover [mask-image:linear-gradient(270deg,black_70%,transparent)] md:block" />
-        <div className="relative mx-auto flex max-w-[1200px] flex-col items-start gap-4 px-4 py-5 md:flex-row md:items-center md:pl-[25%] md:pr-[16%]">
+        <div className="container-site relative flex flex-col items-start gap-4 py-5 md:flex-row md:items-center md:pl-[32%] md:pr-[24%]">
           <div className="flex-1">
             <p className="font-display text-[17px] font-bold uppercase leading-tight tracking-wide">Industrial equipment<br />for a stronger tomorrow</p>
             <p className="mt-2 text-[11.5px] text-white/75">Get in touch with our team for the right equipment, pricing and support for your next project.</p>
@@ -190,7 +190,7 @@ export default async function HomePage() {
 function MachineCard({ p }: { p: CatalogProduct & { spec_line: string[]; type: string | null } }) {
   return (
     <Link href={`/products/${p.slug}`} className="group flex min-w-0 flex-col rounded-sm border border-[#dde5ee] bg-white px-2.5 py-3 shadow-[0_1px_2px_rgba(14,27,44,0.05)] transition-shadow hover:shadow-md">
-      <div className="flex h-[78px] items-center justify-center"><ProductImage src={p.image_url} alt={p.name} categorySlug={p.category_slug} /></div>
+      <div className="flex h-[78px] items-center justify-center 2xl:h-[96px]"><ProductImage src={p.image_url} alt={p.name} categorySlug={p.category_slug} /></div>
       <p className="mt-2.5 truncate text-[11px] font-bold leading-tight text-ink-900" title={p.name}>{p.name}</p>
       {p.type && <p className="text-[11.5px] text-[#3d4652]">{p.type}</p>}
       {p.spec_line.length > 0 && <p className="mb-2.5 mt-0.5 text-[10.5px] text-muted">{p.spec_line.join("  |  ")}</p>}

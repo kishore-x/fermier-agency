@@ -15,7 +15,7 @@ export default async function CategoriesPage() {
   return (
     <div className="bg-page pb-12">
       <PageHero eyebrow="Explore our range" title="Equipment categories" text="Construction, compaction, concrete, power, lifting, material handling and agricultural equipment." />
-      <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-4 pt-8 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="container-site grid grid-cols-2 gap-3 pt-8 sm:grid-cols-3 lg:grid-cols-4">
         {categories.map((c) => (
           <Link key={c.id} href={`/catalog/${c.slug}`} className="group flex flex-col rounded-sm border border-[#e3e8ef] bg-white p-4 transition-shadow hover:shadow-md">
             <div className="flex h-32 items-center justify-center">

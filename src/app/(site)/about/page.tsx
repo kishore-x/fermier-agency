@@ -9,7 +9,7 @@ export default function AboutPage() {
   return (
     <div className="bg-page pb-12">
       <PageHero eyebrow="About us" title={SITE.about.title.join(" ")} />
-      <div className="mx-auto grid max-w-[1200px] items-center gap-8 px-4 pt-8 md:grid-cols-[1fr_1.2fr]">
+      <div className="container-site grid items-center gap-8 pt-8 md:grid-cols-[1fr_1.2fr]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/site/about.jpg" alt="Operator finishing a concrete floor with a power trowel" className="w-full rounded-sm object-cover shadow-md" />
         <div>
@@ -25,7 +25,7 @@ export default function AboutPage() {
           <Link href="/contact" className="mt-6 inline-flex h-10 items-center gap-2 rounded-sm bg-brand px-6 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-600">Get enquiry <ArrowRight className="h-4 w-4" /></Link>
         </div>
       </div>
-      <section className="mx-auto mt-10 max-w-[1200px] px-4">
+      <section className="container-site mt-10">
         <h2 className="font-display text-2xl font-bold uppercase text-ink-900">Why choose us</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {SITE.reasons.map((r) => (

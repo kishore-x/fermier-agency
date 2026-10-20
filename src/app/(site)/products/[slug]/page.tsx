@@ -28,7 +28,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
   const docUrl = (path: string) => storage.getPublicUrl(path).data.publicUrl;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
+    <div className="container-site py-6">
       <nav className="mb-4 text-xs text-muted">
         <Link href="/" className="hover:text-ink">Home</Link> / <Link href="/catalog" className="hover:text-ink">Catalog</Link>
         {p.category_slug && <> / <Link href={`/catalog/${p.category_slug}`} className="hover:text-ink">{p.category_name}</Link></>}

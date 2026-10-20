@@ -16,7 +16,7 @@ export default async function PortalLayout({ children }: LayoutProps<"/portal">)
     <>
       <SiteHeader />
       <div className="border-b border-line bg-white">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-3">
+        <div className="container-site flex flex-wrap items-center justify-between gap-2 py-3">
           <div>
             <p className="text-sm font-semibold">{cust?.company_name}</p>
             <p className="text-xs text-muted">{session.fullName} · Account {cust?.customer_code}</p>
@@ -25,7 +25,7 @@ export default async function PortalLayout({ children }: LayoutProps<"/portal">)
         </div>
         <PortalNav unread={unread ?? 0} />
       </div>
-      <main className="mx-auto min-h-[60vh] max-w-7xl px-4 py-6">{children}</main>
+      <main className="container-site min-h-[60vh] py-6">{children}</main>
       <SiteFooter />
       <MobileBottomNav />
     </>

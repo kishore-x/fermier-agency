@@ -37,3 +37,12 @@ body {
 @media print {
   .no-print { display: none !important; }
 }
+
+/* Full-width site container: uses the screen up to a comfortable reading width.
+   In the components layer so section-specific padding utilities can still override it. */
+@layer components {
+  .container-site { width: 100%; max-width: 1680px; margin-inline: auto; padding-inline: 1rem; }
+  @media (min-width: 768px) { .container-site { padding-inline: 2rem; } }
+  @media (min-width: 1280px) { .container-site { padding-inline: 3rem; } }
+  @media (min-width: 1680px) { .container-site { padding-inline: 4rem; } }
+}

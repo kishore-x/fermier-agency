@@ -10,7 +10,7 @@ export default function ServicesPage() {
   return (
     <div className="bg-page pb-12">
       <PageHero eyebrow="Services" title="Sales, service, spares & rental support" text="Support for the full life of your equipment — from selection to after-sales." />
-      <div className="mx-auto grid max-w-[1200px] gap-3 px-4 pt-8 md:grid-cols-2">
+      <div className="container-site grid gap-3 pt-8 md:grid-cols-2">
         {SITE.services.map((s, i) => {
           const I = ICONS[i];
           return (
@@ -21,7 +21,7 @@ export default function ServicesPage() {
           );
         })}
       </div>
-      <div className="mx-auto mt-6 max-w-[1200px] px-4">
+      <div className="container-site mt-6">
         <Link href="/contact" className="inline-flex h-10 items-center gap-2 rounded-sm bg-brand px-6 text-xs font-bold uppercase tracking-wide text-white hover:bg-brand-600">Get enquiry <ArrowRight className="h-4 w-4" /></Link>
       </div>
     </div>

@@ -14,7 +14,7 @@ export default async function BrandsPage() {
   return (
     <div className="bg-page pb-12">
       <PageHero eyebrow="Our brands" title="Global brands, local support" text="Equipment from internationally recognised manufacturers, backed by our sales, service and spares team." />
-      <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-4 pt-8 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="container-site grid grid-cols-2 gap-3 pt-8 sm:grid-cols-3 lg:grid-cols-4">
         {[...brands].sort((a, b) => Number(!!b.logo_url) - Number(!!a.logo_url)).map((b) => (
           <Link key={b.id} href={`/catalog?brand=${b.slug}`} className="group flex flex-col items-center rounded-sm border border-[#e3e8ef] bg-white p-5 text-center transition-shadow hover:shadow-md">
             <div className="flex h-20 items-center justify-center">
@@ -28,7 +28,7 @@ export default async function BrandsPage() {
           </Link>
         ))}
       </div>
-      <p className="mx-auto mt-6 max-w-[1200px] px-4 text-xs text-muted">Brand names and logos are trademarks of their respective owners.</p>
+      <p className="container-site mt-6 text-xs text-muted">Brand names and logos are trademarks of their respective owners.</p>
     </div>
   );
 }

@@ -30,7 +30,7 @@ export async function SiteHeader({ defaultQuery }: { defaultQuery?: string }) {
   const cats = categories.map((c) => ({ name: c.name, slug: c.slug }));
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-page/95 backdrop-blur">
-      <div className="mx-auto flex h-[60px] max-w-[1280px] items-center gap-4 px-4">
+      <div className="container-site flex h-[60px] items-center gap-4">
         <Logo />
         <NavLinks categories={cats} />
         <div className="ml-auto flex items-center gap-3">
@@ -109,7 +109,7 @@ export async function SiteFooter() {
   const link = "text-[11px] text-white/75 hover:text-white";
   return (
     <footer className="bg-footer pb-16 text-white md:pb-0">
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-7 gap-y-4 px-4 py-4 xl:flex-nowrap xl:justify-between xl:gap-x-5">
+      <div className="container-site flex flex-wrap items-center gap-x-7 gap-y-4 py-4 xl:flex-nowrap xl:justify-between xl:gap-x-5">
         <Logo footer />
         <nav className="flex shrink-0 items-center gap-2 text-white/40" aria-label="Sectors">
           {[["Construction", "/catalog/construction-equipment"], ["Lifting", "/catalog/lifting-equipment"], ["Power", "/catalog/generators"], ["Agri", "/catalog/agriculture-garden-equipment"]].map(([l, h], i) => (
