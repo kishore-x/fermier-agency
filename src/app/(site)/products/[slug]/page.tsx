@@ -5,7 +5,7 @@ import { AddToCartButton } from "@/components/catalog/add-to-cart";
 import { ProductGallery } from "@/components/catalog/gallery";
 import { ProductCard } from "@/components/catalog/product-card";
 import { getCompany, getProductBySlug, whatsappLink } from "@/lib/queries/catalog";
-import { env } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
 import { formatMoney } from "@/lib/utils";
 
 export async function generateMetadata({ params }: PageProps<"/products/[slug]">) {
@@ -24,7 +24,8 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
     return acc;
   }, {});
   const wa = whatsappLink(company?.whatsapp_number, `Hello, I'd like details on ${p.name} (${p.sku}).`);
-  const docUrl = (path: string) => `${env.supabaseUrl()}/storage/v1/object/public/product-documents/${path}`;
+  const storage = (await createClient()).storage.from("product-documents");
+  const docUrl = (path: string) => storage.getPublicUrl(path).data.publicUrl;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6">

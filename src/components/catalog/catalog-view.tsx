@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PackageSearch, X } from "lucide-react";
+import { PackageSearch, SlidersHorizontal, X } from "lucide-react";
 import { ProductCard } from "./product-card";
 import { Pagination } from "@/components/ui/data";
 import { EmptyState, LinkButton } from "@/components/ui/primitives";
@@ -39,7 +39,12 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-        <form action={basePath} className="h-fit space-y-4 rounded-lg border border-line bg-white p-4 text-sm lg:sticky lg:top-20">
+        <div>
+        <input type="checkbox" id="filters-toggle" className="peer sr-only" />
+        <label htmlFor="filters-toggle" className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border border-line bg-white text-sm font-medium lg:hidden">
+          <SlidersHorizontal className="h-4 w-4" /> Filters & sort{active.length ? ` (${active.length})` : ""}
+        </label>
+        <form action={basePath} className="mt-2 hidden h-fit space-y-4 rounded-lg border border-line bg-white p-4 text-sm peer-checked:block lg:sticky lg:top-20 lg:mt-0 lg:block">
           <div>
             <label className="mb-1 block font-medium" htmlFor="q">Search</label>
             <input id="q" name="q" defaultValue={filters.q} placeholder="Name, SKU, brand, model" autoFocus={filters.focus === "search"}
@@ -84,6 +89,7 @@ export async function CatalogView({ filters, basePath, title, lockedCategory }: 
             <Link href={basePath} className="h-9 rounded-md border border-line px-3 leading-9 text-muted hover:text-ink">Reset</Link>
           </div>
         </form>
+        </div>
 
         <div>
           {active.length > 0 && (

@@ -13,7 +13,7 @@ export async function loadEditorData(userId: string) {
   const { data: taxes } = await supabase.from("products").select("id, tax_rate").in("id", (products ?? []).map((p) => p.product_id));
   const tax = new Map((taxes ?? []).map((t) => [t.id, t.tax_rate]));
   return {
-    products: (products ?? []).map<ProductOpt>((p) => ({ id: p.product_id, sku: p.sku, name: p.name, selling_price: p.selling_price, unit: p.unit, available: Number(p.available), tax_rate: tax.get(p.product_id) ?? "18" })),
+    products: (products ?? []).map<ProductOpt>((p) => ({ id: p.product_id, sku: p.sku, name: p.name, selling_price: p.selling_price === null ? null : String(p.selling_price), unit: p.unit, available: Number(p.available), tax_rate: String(tax.get(p.product_id) ?? "18") })),
     customers: customers ?? [],
     approvalPct: Number(settings?.approval_discount_pct ?? 10),
     approvalAmount: Number(settings?.approval_amount_threshold ?? 500000),

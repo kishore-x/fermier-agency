@@ -58,8 +58,9 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
                       <tr key={ri} className="border-b border-line">
                         {r.map((c, i) => {
                           const num = report!.numeric.includes(i);
+                          const numeric = typeof c === "number" || (typeof c === "string" && /^-?\d+(\.\d+)?$/.test(c));
                           const v = c === null ? <span className="text-muted">{report!.headers[i] === "Balance" ? "Unsynchronised" : "—"}</span>
-                            : num && typeof c !== "string" ? c : num && /^-?\d+(\.\d+)?$/.test(String(c)) ? (MONEY_HEADERS.test(report!.headers[i]) ? formatMoney(c) : formatQty(c))
+                            : num && numeric ? (MONEY_HEADERS.test(report!.headers[i]) ? formatMoney(c) : formatQty(c))
                             : report!.headers[i] === "When" ? formatDateTime(String(c))
                             : ["Status", "Type", "Source"].includes(report!.headers[i]) ? humanize(String(c)) : String(c);
                           return <td key={i} className={`px-4 py-2 ${num ? "text-right tnum" : ""}`}>{v}</td>;

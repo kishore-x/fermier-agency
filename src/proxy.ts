@@ -8,8 +8,14 @@ export async function proxy(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !key) {
-    if (request.nextUrl.pathname === "/setup") return response;
-    return NextResponse.rewrite(new URL("/setup", request.url));
+    // Local demo database: the signed session cookie is verified server-side; this is only the optimistic redirect.
+    const path = request.nextUrl.pathname;
+    if (!request.cookies.get("fa_session") && (path.startsWith("/admin") || path.startsWith("/portal"))) {
+      const login = new URL("/login", request.url);
+      login.searchParams.set("next", path);
+      return NextResponse.redirect(login);
+    }
+    return response;
   }
 
   const supabase = createServerClient(url, key, {

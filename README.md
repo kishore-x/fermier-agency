@@ -51,7 +51,14 @@ EMAIL_FROM="Fermier Agency <no-reply@example.com>"
 CRON_SECRET=change-me                                   # long random string
 ```
 
-If the Supabase variables are missing, every route shows a setup screen instead of failing.
+If the Supabase variables are missing, the app runs in **local demo mode** (next section).
+
+### Local demo mode (no Supabase)
+
+With no `NEXT_PUBLIC_SUPABASE_URL` set, `npm run dev` starts an embedded Postgres (PGlite) in `.data/`, applies the same migrations, RLS policies and seed, and creates the demo accounts and sample orders on first start. Sign-in uses local accounts (signed session cookie), uploads are stored in `.data/storage`. The login page lists one-click demo accounts; password `demo1234` (override with `DEMO_PASSWORD`).
+
+- Reset the demo data: stop the server, `rm -rf .data`, start again.
+- Local mode is for demos on one machine. It is not for production or for Vercel, whose serverless filesystem is not persistent. Use Supabase for anything shared.
 
 ---
 

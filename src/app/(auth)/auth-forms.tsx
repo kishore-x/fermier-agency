@@ -17,6 +17,20 @@ export function LoginForm({ next }: { next?: string }) {
   );
 }
 
+export function DemoLogin({ email, password, label, sub, next }: { email: string; password: string; label: string; sub: string; next?: string }) {
+  return (
+    <ActionForm action={signIn}>
+      <input type="hidden" name="email" value={email} />
+      <input type="hidden" name="password" value={password} />
+      <input type="hidden" name="next" value={next ?? ""} />
+      <button className="flex w-full items-center justify-between rounded-md border border-line px-3 py-2 text-left text-sm hover:border-navy/40 hover:bg-canvas">
+        <span><span className="font-medium">{label}</span><span className="block text-xs text-muted">{sub}</span></span>
+        <span className="text-xs font-medium text-navy">Sign in →</span>
+      </button>
+    </ActionForm>
+  );
+}
+
 export function RegisterForm() {
   return (
     <ActionForm action={register} className="space-y-4">
