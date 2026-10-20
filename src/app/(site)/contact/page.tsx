@@ -5,7 +5,8 @@ import { getCompany, whatsappLink } from "@/lib/queries/catalog";
 
 export const metadata = { title: "Contact us" };
 
-export default async function ContactPage() {
+export default async function ContactPage({ searchParams }: PageProps<"/contact">) {
+  const { product } = (await searchParams) as { product?: string };
   const c = await getCompany();
   const wa = whatsappLink(c?.whatsapp_number, "Hello Fermier Agency, I have an enquiry.");
   return (
@@ -20,7 +21,7 @@ export default async function ContactPage() {
           {wa && <li className="flex gap-2"><MessageCircle className="h-4 w-4 text-brand" /><a href={wa} target="_blank" rel="noopener noreferrer" className="text-navy hover:underline">Chat on WhatsApp (opens WhatsApp)</a></li>}
         </ul>
       </div>
-      <Card className="p-5"><ContactForm /></Card>
+      <Card className="p-5"><ContactForm product={product?.slice(0, 200)} /></Card>
     </div>
   );
 }

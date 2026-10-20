@@ -55,7 +55,7 @@ export function RegisterForm() {
   );
 }
 
-export function ContactForm() {
+export function ContactForm({ product }: { product?: string }) {
   return (
     <ActionForm action={submitContact} className="space-y-4" resetOnSuccess>
       {(s) => (
@@ -68,7 +68,7 @@ export function ContactForm() {
             <Field label="Phone" name="phone"><Input id="phone" name="phone" type="tel" /></Field>
           </div>
           <Field label="What do you need?" name="message" required error={s?.fieldErrors?.message}>
-            <textarea id="message" name="message" required rows={5} placeholder="Products, quantities, site location, timeline…"
+            <textarea id="message" name="message" required rows={5} placeholder="Products, quantities, site location, timeline…" defaultValue={product ? `Enquiry for ${product}\nQuantity: \nSite location: \nRequired by: ` : undefined}
               className="w-full rounded-md border border-line p-3 text-sm focus:border-navy focus:outline-none" />
           </Field>
           {s?.ok && <p className="rounded-md bg-brand-50 p-3 text-sm text-brand-600">{s.message}</p>}

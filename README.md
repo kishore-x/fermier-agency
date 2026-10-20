@@ -32,6 +32,18 @@ Tests: `npm test` runs 30+ tests — the full order workflow, overselling preven
 
 ---
 
+## 1a. Real catalogue import (fermieragency.com)
+
+The live catalogue (categories, brands, products, specifications and HD photos) is imported from the public website API:
+
+```bash
+python3 -I scripts/scrape-fermier-site.py            # full import → public/catalog/ + supabase/seed-real-catalog.sql
+python3 -I scripts/scrape-fermier-site.py --site-images      # hero / about / logo imagery
+python3 -I scripts/scrape-fermier-site.py --datasheets-only  # rebuild PDF datasheet images from existing photos
+```
+
+Photos are validated, converted to WebP (≤1800 px) and low-resolution duplicates are dropped. `seed-real-catalog.sql` runs after `seed.sql` (see `supabase/config.toml`) and retires the earlier sample catalogue from public view. The website publishes no prices, so all products are "price on request"; opening stock levels are sample values. Every product has a branded PDF data sheet at `/products/<slug>/datasheet`.
+
 ## 2. Environment variables
 
 Copy `.env.example` → `.env.local`. Placeholders only:

@@ -84,6 +84,7 @@ async function initialise(state: State, fresh: boolean) {
     await db.exec(PLATFORM_STUB);
     for (const f of migrations) await db.exec(readFileSync(join(root, "migrations", f), "utf8"));
     await db.exec(readFileSync(join(root, "seed.sql"), "utf8"));
+    if (existsSync(join(root, "seed-real-catalog.sql"))) await db.exec(readFileSync(join(root, "seed-real-catalog.sql"), "utf8"));
     await db.exec("create table public._local_meta (key text primary key, value text); revoke all on public._local_meta from anon, authenticated;");
     for (const f of migrations) await db.query("insert into public._local_meta values ($1, now()::text)", [`migration:${f}`]);
   } else {

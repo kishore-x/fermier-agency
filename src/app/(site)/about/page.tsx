@@ -11,7 +11,7 @@ export default function AboutPage() {
       <PageHero eyebrow="About us" title={SITE.about.title.join(" ")} />
       <div className="container-site grid items-center gap-8 pt-8 md:grid-cols-[1fr_1.2fr]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/site/about.jpg" alt="Operator finishing a concrete floor with a power trowel" className="w-full rounded-sm object-cover shadow-md" />
+        <img src="/site/about-trowel.webp" alt="Operator finishing a concrete floor with a power trowel" className="w-full rounded-sm bg-gradient-to-b from-band to-white object-contain" />
         <div>
           <p className="text-[15px] leading-relaxed text-[#3d4652]">{SITE.about.text}</p>
           <ul className="mt-6 grid grid-cols-2 gap-3">

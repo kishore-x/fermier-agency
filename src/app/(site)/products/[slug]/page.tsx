@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2, Download, FileText, Package, ShieldCheck, Truck, Wrench } from "lucide-react";
+import { CheckCircle2, Download, FileText, Package, Send, ShieldCheck, Truck, Wrench } from "lucide-react";
 import { AddToCartButton } from "@/components/catalog/add-to-cart";
 import { ProductGallery } from "@/components/catalog/gallery";
 import { ProductCard } from "@/components/catalog/product-card";
@@ -32,7 +32,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
   const groups = sheet.reduce<Record<string, { label: string; value: string }[]>>((acc, s) => { (acc[s.spec_group] ??= []).push(s); return acc; }, {});
   const highlights = sheet.slice(0, 4);
   const wa = whatsappLink(company?.whatsapp_number, `Hello, I'd like a quote for ${p.name} (Code: ${p.sku}).`);
-  const docUrl = (path: string) => supabase.storage.from("product-documents").getPublicUrl(path).data.publicUrl;
+  const docUrl = (path: string) => (path.startsWith("/") || path.startsWith("http") ? path : supabase.storage.from("product-documents").getPublicUrl(path).data.publicUrl);
 
   let defaultAddress = "";
   if (session?.customerId) {
@@ -69,7 +69,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
             {type && <p className="text-lg text-[#3d4652]">{type}</p>}
             <div className="mt-3 flex flex-wrap gap-2 text-xs">
               <span className="rounded-sm bg-band px-2.5 py-1"><span className="text-muted">Code</span> <strong>{p.sku}</strong></span>
-              {p.model_number && <span className="rounded-sm bg-band px-2.5 py-1"><span className="text-muted">Model</span> <strong>{p.model_number}</strong></span>}
+              {p.model_number && p.model_number !== p.name && <span className="rounded-sm bg-band px-2.5 py-1"><span className="text-muted">Model</span> <strong>{p.model_number}</strong></span>}
               {p.brand_name && <span className="rounded-sm bg-band px-2.5 py-1"><span className="text-muted">Brand</span> <strong>{p.brand_name}</strong></span>}
               {p.hsn_code && <span className="rounded-sm bg-band px-2.5 py-1"><span className="text-muted">HSN</span> <strong>{p.hsn_code}</strong></span>}
             </div>
@@ -99,6 +99,14 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
                 <p className={available > 0 ? "text-sm font-semibold text-ok-600" : "text-sm font-semibold text-amber-700"}>
                   {available > 0 ? `In stock · ${available} ${p.unit} available` : "On order · lead time on quotation"}
                 </p>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <Link href={`/contact?product=${encodeURIComponent(`${p.name} (Code: ${p.sku})`)}`} className="flex h-12 items-center justify-center gap-2 rounded-md bg-brand text-sm font-bold uppercase tracking-wide text-white hover:bg-brand-600">
+                  <Send className="h-4 w-4" /> Enquire now
+                </Link>
+                <a href={`/products/${p.slug}/datasheet`} className="flex h-12 items-center justify-center gap-2 rounded-md border-2 border-ink-900 text-sm font-bold uppercase tracking-wide text-ink-900 hover:bg-band">
+                  <Download className="h-4 w-4" /> Download datasheet
+                </a>
               </div>
               {!session?.isStaff && <AddToCartButton product={p} withQty label={p.display_price ? "Add to cart" : "Add to quote request"} />}
               <RaisePurchaseOrder product={p} defaultAddress={defaultAddress} returnTo={`/products/${p.slug}`}
@@ -205,13 +213,16 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
 
         <section>
           <SectionTitle id="documents">Brochures & documents</SectionTitle>
+          <a href={`/products/${p.slug}/datasheet`} className="mt-4 flex max-w-md items-center gap-3 rounded-md border border-[#dde5ee] bg-white p-3 text-sm font-medium text-ink-900 hover:border-brand">
+            <FileText className="h-5 w-5 text-brand" />{p.name} — product data sheet (PDF)<Download className="ml-auto h-4 w-4 text-muted" />
+          </a>
           {docs.length ? (
             <ul className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {docs.map((d) => (
                 <li key={d.id}><a href={docUrl(d.storage_path)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-md border border-[#dde5ee] bg-white p-3 text-sm font-medium text-ink-900 hover:border-brand"><FileText className="h-5 w-5 text-brand" />{d.title}<Download className="ml-auto h-4 w-4 text-muted" /></a></li>
               ))}
             </ul>
-          ) : <p className="mt-3 text-sm text-muted">No brochure uploaded yet — ask our team for the datasheet{wa ? <> on <a href={wa} target="_blank" rel="noopener noreferrer" className="font-semibold text-brand hover:underline">WhatsApp</a></> : null}.</p>}
+          ) : null}
         </section>
 
         {related.length > 0 && (

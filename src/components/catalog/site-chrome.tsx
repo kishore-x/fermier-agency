@@ -14,7 +14,7 @@ export function Logo({ footer = false, className }: { footer?: boolean; classNam
   return (
     <Link href="/" className={className ?? "shrink-0"} aria-label="Fermier Agency home">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={footer ? "/site/logo-footer.png" : "/site/logo.png"} alt="Fermier Agency" className="h-[30px] w-auto" />
+      <img src="/site/logo-hd.png" alt="Fermier Agency" className={footer ? "h-[30px] w-auto rounded-full bg-white px-2 py-1 box-content" : "h-[30px] w-auto"} />
     </Link>
   );
 }

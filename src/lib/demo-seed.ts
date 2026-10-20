@@ -48,7 +48,14 @@ export async function runDemoSeed(admin: Client, signIn: (email: string) => Prom
   const { count } = await admin.from("enquiries").select("id", { count: "exact", head: true });
   if ((count ?? 0) > 0) { log("• transactions already exist — skipping sample workflow"); return; }
 
-  const pid = async (sku: string) => (await admin.from("products").select("id").eq("sku", sku).single()).data!.id as string;
+  // Prefer the real Fermier catalogue (seed-real-catalog.sql); fall back to the sample catalogue in seed.sql.
+  const pid = async (...skus: string[]) => {
+    for (const sku of skus) {
+      const { data } = await admin.from("products").select("id").eq("sku", sku).eq("status", "active").maybeSingle();
+      if (data) return data.id as string;
+    }
+    throw new Error(`None of ${skus.join(", ")} is an active product`);
+  };
   const buyerA = await as("buyer@sample-builders.demo");
   const buyerB = await as("buyer@demo-agro.demo");
   const sales = await as("sales@fermier.demo");
@@ -57,13 +64,13 @@ export async function runDemoSeed(admin: Client, signIn: (email: string) => Prom
 
   // 1. Completed flow for Sample Builders: request → quote → accept → PO → order → reserve → dispatch → invoice (mock)
   const [r1] = await rpc<{ id: string; enquiry_number: string }[]>(buyerA, "submit_order_request", {
-    p_items: [{ product_id: await pid("YT-WN-500P"), quantity: 4 }, { product_id: await pid("YT-MC-FR01"), quantity: 2 }],
-    p_delivery_address: "Demo site, Chennai (sample)", p_requested_date: null, p_notes: "Sample request: rooftop lifting for site block B",
+    p_items: [{ product_id: await pid("DDR20-G", "YT-WN-500P"), quantity: 1 }, { product_id: await pid("SR-80", "YT-MC-FR01"), quantity: 2 }],
+    p_delivery_address: "Demo site, Chennai (sample)", p_requested_date: null, p_notes: "Sample request: compaction for site access road",
   });
   const custA = (await admin.from("customers").select("id").eq("customer_code", "CUS-DEMO-001").single()).data!.id;
   const q1 = await rpc<string>(sales, "save_quotation", { p_id: null,
     p_header: { customer_id: custA, enquiry_id: r1.id, shipping_charges: "1500", payment_terms: "Net 30", delivery_address: "Demo site, Chennai (sample)" },
-    p_items: [{ product_id: await pid("YT-WN-500P"), quantity: 4, unit_price: "62500", discount_pct: "5" }, { product_id: await pid("YT-MC-FR01"), quantity: 2, unit_price: "27500" }] });
+    p_items: [{ product_id: await pid("DDR20-G", "YT-WN-500P"), quantity: 1, unit_price: "385000", discount_pct: "5" }, { product_id: await pid("SR-80", "YT-MC-FR01"), quantity: 2, unit_price: "92000" }] });
   await rpc(sales, "transition_quotation", { p_id: q1, p_action: "submit" });
   const st = (await admin.from("quotations").select("status, grand_total").eq("id", q1).single()).data!;
   if (st.status === "pending_approval") await rpc(mgr, "transition_quotation", { p_id: q1, p_action: "approve" });
@@ -91,12 +98,12 @@ export async function runDemoSeed(admin: Client, signIn: (email: string) => Prom
 
   // 2. Quotation awaiting the customer (Demo Agro)
   const [r2] = await rpc<{ id: string }[]>(buyerB, "submit_order_request", {
-    p_items: [{ product_id: await pid("AK-PWD-7HP"), quantity: 3 }, { product_id: await pid("AK-BC-52"), quantity: 5 }, { product_id: await pid("PM-GEN-7K"), quantity: 1 }],
-    p_delivery_address: "Demo godown, Coimbatore (sample)", p_requested_date: null, p_notes: "Sample: monsoon season stock-up",
+    p_items: [{ product_id: await pid("GW-52", "AK-PWD-7HP"), quantity: 2 }, { product_id: await pid("RC-32MM", "AK-BC-52"), quantity: 3 }, { product_id: await pid("SM-240", "PM-GEN-7K"), quantity: 1 }],
+    p_delivery_address: "Demo godown, Coimbatore (sample)", p_requested_date: null, p_notes: "Sample: rebar yard set-up for bridge project",
   });
   const custB = (await admin.from("customers").select("id").eq("customer_code", "CUS-DEMO-002").single()).data!.id;
   const q2 = await rpc<string>(sales, "save_quotation", { p_id: null, p_header: { customer_id: custB, enquiry_id: r2.id, payment_terms: "50% advance, balance before dispatch" },
-    p_items: [{ product_id: await pid("AK-PWD-7HP"), quantity: 3, unit_price: "54000", discount_pct: "3" }, { product_id: await pid("AK-BC-52"), quantity: 5, unit_price: "11500" }, { product_id: await pid("PM-GEN-7K"), quantity: 1, unit_price: "185000" }] });
+    p_items: [{ product_id: await pid("GW-52", "AK-PWD-7HP"), quantity: 2, unit_price: "168000", discount_pct: "3" }, { product_id: await pid("RC-32MM", "AK-BC-52"), quantity: 3, unit_price: "38500" }, { product_id: await pid("SM-240", "PM-GEN-7K"), quantity: 1, unit_price: "126000" }] });
   await rpc(sales, "transition_quotation", { p_id: q2, p_action: "submit" });
   if ((await admin.from("quotations").select("status").eq("id", q2).single()).data!.status === "pending_approval") await rpc(mgr, "transition_quotation", { p_id: q2, p_action: "approve" });
   await rpc(sales, "transition_quotation", { p_id: q2, p_action: "mark_sent" });
@@ -104,12 +111,12 @@ export async function runDemoSeed(admin: Client, signIn: (email: string) => Prom
 
   // 3. A fresh order request for the demo to pick up live
   await rpc(buyerA, "submit_order_request", {
-    p_items: [{ product_id: await pid("FP-PW-3000"), quantity: 2 }, { product_id: await pid("FP-VC-30L"), quantity: 2 }],
-    p_delivery_address: "Demo site, Chennai (sample)", p_requested_date: new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10), p_notes: "Sample: new car-wash bay",
+    p_items: [{ product_id: await pid("Q500", "FP-PW-3000"), quantity: 1 }, { product_id: await pid("STRHV-10", "FP-VC-30L"), quantity: 4 }],
+    p_delivery_address: "Demo site, Chennai (sample)", p_requested_date: new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10), p_notes: "Sample: slab cutting and vibration for new warehouse",
   });
   // 4. A website enquiry not yet linked to a customer
   const { data: n } = await admin.rpc("next_document_number", { p_type: "enquiry" });
-  await admin.from("enquiries").insert({ enquiry_number: n, source: "website", contact_name: "Sample Website Visitor", contact_email: "visitor@example.com", notes: "Sample: need 2 x 3 kVA generators for a site office" });
+  await admin.from("enquiries").insert({ enquiry_number: n, source: "website", contact_name: "Sample Website Visitor", contact_email: "visitor@example.com", notes: "Sample: need a quote for 2 walk-behind rollers (DDR20 series)" });
   log("✓ open enquiries created\nDone. All records above are sample data.");
 }
 

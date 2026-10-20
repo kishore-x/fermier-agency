@@ -12,7 +12,7 @@ export function ProductCard({ p, whatsapp }: { p: CatalogCardProduct; whatsapp?:
   const ratings = p.specs.slice(0, 2).map((s) => s.value);
   const rows: { label: string; value: string }[] = [
     ...(p.brand_name ? [{ label: "Brand", value: p.brand_name }] : []),
-    ...(p.model_number ? [{ label: "Model", value: p.model_number }] : []),
+    ...(p.model_number && p.model_number !== p.name ? [{ label: "Model", value: p.model_number }] : []),
     ...p.specs,
   ].slice(0, 7);
   const wa = whatsappLink(whatsapp, `Hello, I'd like a quote for ${p.name} (Code: ${p.sku}).`);
@@ -24,7 +24,7 @@ export function ProductCard({ p, whatsapp }: { p: CatalogCardProduct; whatsapp?:
       </Link>
       <Link href={`/products/${p.slug}`} className="relative block bg-gradient-to-br from-white via-white to-[#eef2f7] px-3 pb-2 pt-3">
         <div className="flex items-start justify-between gap-2 text-[10px] font-bold uppercase leading-tight text-ink-900">
-          <span>{p.sku}{p.model_number ? <><br />▸ {p.model_number}</> : null}</span>
+          <span>{p.sku}{p.model_number && p.model_number !== p.name ? <><br />▸ {p.model_number}</> : null}</span>
           {p.is_featured && <span className="rounded bg-brand px-1.5 py-0.5 text-[9px] text-white">Featured</span>}
         </div>
         <div className="mx-auto mt-1 flex h-[130px] items-center justify-center">

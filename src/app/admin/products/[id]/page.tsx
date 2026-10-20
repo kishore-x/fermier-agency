@@ -28,7 +28,7 @@ export default async function EditProductPage({ params, searchParams }: PageProp
   ]);
   if (!p) notFound();
   const manage = can.manageProducts(session);
-  const docUrl = (path: string) => supabase.storage.from("product-documents").getPublicUrl(path).data.publicUrl;
+  const docUrl = (path: string) => (path.startsWith("/") || path.startsWith("http") ? path : supabase.storage.from("product-documents").getPublicUrl(path).data.publicUrl);
 
   return (
     <div className="max-w-6xl">

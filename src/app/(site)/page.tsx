@@ -19,16 +19,16 @@ const ViewAll = ({ href, children }: { href: string; children: React.ReactNode }
 
 export default async function HomePage() {
   const [categories, featured, brands] = await Promise.all([getCategories(), getFeatured(6), getBrands()]);
-  const order = ["masalta", "wacker-neuson", "bomag", "mikasa", "belle", "dynapac"];
-  const logoBrands = brands.filter((b) => b.logo_url).sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug)).slice(0, 6);
+  const logoBrands = brands.filter((b) => b.logo_url).slice(0, 6);
   return (
     <div className="bg-page">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[linear-gradient(180deg,#0a0d14_0%,#12151c_45%,#2a2e36_80%,#4a4e58_100%)] text-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/site/hero.jpg" alt="Power trowel on a concrete site floor"
-          className="pointer-events-none absolute left-1/2 top-0 h-full w-auto max-w-none -translate-x-[30%] opacity-35 [mask-image:linear-gradient(90deg,transparent,black_14%,black_86%,transparent)] md:-translate-x-[38%] md:opacity-100" />
-        <div className="container-site relative flex min-h-[250px] items-center py-7">
+        <img src="/site/hero-banner.webp" alt="Stroke rollers, rebar machines and concrete mixers on a construction site"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[70%_center]" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(8,11,18,0.92)_0%,rgba(8,11,18,0.78)_38%,rgba(8,11,18,0.25)_70%,rgba(8,11,18,0.45)_100%)]" />
+        <div className="container-site relative flex min-h-[360px] items-center py-10">
           <div className="max-w-[420px]">
             <Eyebrow className="text-[#3a95f7]">{SITE.hero.eyebrow}</Eyebrow>
             <h1 className="mt-2 font-display text-[36px] font-bold leading-[1.06] tracking-tight">
@@ -67,7 +67,7 @@ export default async function HomePage() {
       {/* About + brands */}
       <section className="container-site grid items-center gap-8 py-6 lg:grid-cols-[minmax(200px,300px)_minmax(0,1.15fr)_1px_minmax(0,1fr)] xl:gap-10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/site/about.jpg" alt="Operator finishing a concrete floor with a power trowel" className="h-[170px] w-full rounded-sm object-cover shadow-md 2xl:h-[210px]" />
+        <img src="/site/about-trowel.webp" alt="Operator finishing a concrete floor with a power trowel" className="h-[220px] w-full rounded-sm bg-gradient-to-b from-band to-white object-contain 2xl:h-[260px]" />
         <div>
           <Eyebrow>About us</Eyebrow>
           <Heading className="mt-2">{SITE.about.title.map((t) => <span key={t} className="block">{t}</span>)}</Heading>
@@ -170,11 +170,9 @@ export default async function HomePage() {
       {/* CTA band */}
       <section className="relative overflow-hidden bg-footer text-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/site/cta-left.jpg" alt="" className="absolute inset-y-0 left-0 hidden h-full w-[36%] object-cover [mask-image:linear-gradient(90deg,black_70%,transparent)] md:block" />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/site/cta-right.jpg" alt="" className="absolute inset-y-0 right-0 hidden h-full w-[29%] object-cover [mask-image:linear-gradient(270deg,black_70%,transparent)] md:block" />
-        <div className="container-site relative flex flex-col items-start gap-4 py-5 md:flex-row md:items-center md:pl-[32%] md:pr-[24%]">
-          <div className="flex-1">
+        <img src="/site/hero-banner.webp" alt="" className="absolute inset-0 h-full w-full object-cover object-center opacity-35" />
+        <div className="container-site relative flex flex-col items-start gap-4 py-5 md:flex-row md:items-center md:justify-center">
+          <div className="max-w-xl">
             <p className="font-display text-[17px] font-bold uppercase leading-tight tracking-wide">Industrial equipment<br />for a stronger tomorrow</p>
             <p className="mt-2 text-[11.5px] text-white/75">Get in touch with our team for the right equipment, pricing and support for your next project.</p>
           </div>

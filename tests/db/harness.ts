@@ -20,7 +20,7 @@ alter default privileges in schema public grant all on sequences to anon, authen
 grant execute on function auth.uid() to anon, authenticated;
 `;
 
-export async function createDb() {
+export async function createDb(opts: { realCatalog?: boolean } = {}) {
   const db = await PGlite.create({ extensions: { pg_trgm, pgcrypto } });
   await db.exec(SUPABASE_STUB);
   const migrations = readdirSync(join(root, "migrations")).filter((f) => f.endsWith(".sql")).sort();
@@ -29,6 +29,7 @@ export async function createDb() {
     await db.exec(readFileSync(join(root, "migrations", f), "utf8"));
   }
   await db.exec(readFileSync(join(root, "seed.sql"), "utf8"));
+  if (opts.realCatalog) await db.exec(readFileSync(join(root, "seed-real-catalog.sql"), "utf8"));
   return db;
 }
 

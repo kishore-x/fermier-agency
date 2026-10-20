@@ -83,12 +83,15 @@ export async function getProductBySlug(slug: string) {
   const supabase = await createClient();
   const { data: p } = await supabase.from("catalog_products").select("*").eq("slug", slug).maybeSingle();
   if (!p) return null;
-  const [{ data: images }, { data: specs }, { data: docs }, { data: related }] = await Promise.all([
+  const [{ data: images }, { data: specs }, { data: docs }, { data: related }, { data: cat }] = await Promise.all([
     supabase.from("product_images").select("id, url, alt").eq("product_id", p.id).order("sort_order"),
     supabase.from("product_specifications").select("spec_group, label, value").eq("product_id", p.id).order("sort_order"),
     supabase.from("product_documents").select("id, title, storage_path, file_type").eq("product_id", p.id),
     supabase.from("catalog_products").select("*").eq("category_slug", p.category_slug).neq("id", p.id).limit(4),
+    supabase.from("categories").select("applications").eq("id", p.category_id).maybeSingle(),
   ]);
+  // Products without their own application list inherit their category's.
+  if (!p.applications?.length && cat?.applications?.length) p.applications = cat.applications;
   return {
     product: p as CatalogProduct & { description: string | null; manufacturer: string | null; features: string[]; applications: string[];
       in_the_box: string[]; warranty: string | null; hsn_code: string | null },
