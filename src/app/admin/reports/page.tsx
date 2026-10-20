@@ -20,6 +20,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
   if (tab) { try { report = await runReport(tab, from, to, dim); } catch (e) { error = e instanceof Error ? e.message : "Report failed"; } }
   const qs = new URLSearchParams({ tab: tab ?? "", from, to, dim }).toString();
   const usesDates = tab === "sales" || tab === "quotations" || tab === "movements";
+  const showDim = tab === "sales";
 
   return (
     <>
@@ -31,12 +32,12 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
       {!tab && <Alert>No reports are available for your role.</Alert>}
       {tab && (
         <Card>
-          {(usesDates || tab === "sales") && (
+          {usesDates && (
             <form className="flex flex-wrap items-end gap-2 border-b border-line p-3">
               <input type="hidden" name="tab" value={tab} />
               <label className="text-sm">From<Input type="date" name="from" defaultValue={from} className="mt-1 w-40" /></label>
               <label className="text-sm">To<Input type="date" name="to" defaultValue={to} className="mt-1 w-40" /></label>
-              {tab === "sales" && (
+              {showDim && (
                 <label className="text-sm">Group by<Select name="dim" defaultValue={dim} className="mt-1 w-40">
                   {["period", "product", "category", "customer", "salesperson"].map((d) => <option key={d} value={d}>{d === "period" ? "Month" : humanize(d)}</option>)}
                 </Select></label>
