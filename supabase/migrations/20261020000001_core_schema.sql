@@ -122,7 +122,6 @@ create table products (
   description text,
   unit text not null default 'Nos',
   selling_price numeric(14,2),
-  purchase_cost numeric(14,2),
   tax_rate numeric(5,2) not null default 18.00,
   hsn_code text,
   price_visibility price_visibility not null default 'show_price',
@@ -142,7 +141,13 @@ create index idx_products_brand on products(brand_id);
 create index idx_products_status on products(status);
 create index idx_products_search on products using gin ((name || ' ' || sku || ' ' || coalesce(model_number,'')) gin_trgm_ops);
 
--- Purchase cost is staff-only: expose public fields through a view.
+-- Purchase cost lives apart from products so RLS can restrict it to cost-authorized roles.
+create table product_costs (
+  product_id uuid primary key references products(id) on delete cascade,
+  purchase_cost numeric(14,2) check (purchase_cost is null or purchase_cost >= 0),
+  updated_at timestamptz not null default now()
+);
+
 create table product_images (
   id uuid primary key default gen_random_uuid(),
   product_id uuid not null references products(id) on delete cascade,

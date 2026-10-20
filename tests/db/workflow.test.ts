@@ -44,7 +44,8 @@ describe("seed", () => {
     expect(rows.rows[0]).not.toHaveProperty("purchase_cost");
     const onRequest = rows.rows.find((r) => r.sku === "YT-WN-1000")!;
     expect(onRequest.display_price).toBeNull();
-    await expect(asUser(db, null, (tx) => tx.query("select purchase_cost from products"))).resolves.toMatchObject({ rows: [] });
+    await expect(asUser(db, null, (tx) => tx.query("select purchase_cost from product_costs"))).resolves.toMatchObject({ rows: [] });
+    await expect(asUser(db, null, (tx) => tx.query("select * from products"))).resolves.toMatchObject({ rows: [] });
   });
 });
 
@@ -270,5 +271,31 @@ describe("stock safety", () => {
     expect(r.rows).toHaveLength(1);
     const a = await asUser(db, custA, (tx) => tx.query("select * from audit_logs"));
     expect(a.rows).toHaveLength(0);
+  });
+});
+
+describe("cost visibility and reports", () => {
+  it("only cost-authorized roles can read purchase cost", async () => {
+    const asExec = await asUser(db, exec, (tx) => tx.query("select * from product_costs"));
+    expect(asExec.rows).toHaveLength(0);
+    const asInv = await asUser(db, inventory, (tx) => tx.query("select * from product_costs"));
+    expect(asInv.rows.length).toBe(18);
+  });
+
+  it("dashboard hides stock value from sales roles", async () => {
+    const m1 = await asUser(db, exec, (tx) => one<{ dashboard_metrics: Record<string, unknown> }>(tx, "select dashboard_metrics()"));
+    expect(m1.dashboard_metrics.stock_value).toBeNull();
+    const m2 = await asUser(db, admin, (tx) => one<{ dashboard_metrics: Record<string, unknown> }>(tx, "select dashboard_metrics()"));
+    expect(Number(m2.dashboard_metrics.stock_value)).toBeGreaterThan(0);
+    await expect(asUser(db, custA, (tx) => tx.query("select dashboard_metrics()"))).rejects.toThrow(/FORBIDDEN/);
+  });
+
+  it("sales report sums confirmed orders and excludes cancelled", async () => {
+    const r = await asUser(db, manager, (tx) =>
+      tx.query<{ label: string; revenue: string }>("select * from report_sales(current_date - 30, current_date, 'customer')"));
+    const a = r.rows.find((x) => x.label.startsWith("Sample Builders"))!;
+    expect(a.revenue).toBe("346650.00");
+    await expect(asUser(db, exec, (tx) => tx.query("select * from report_sales(current_date - 30, current_date, 'customer')")))
+      .rejects.toThrow(/FORBIDDEN/);
   });
 });

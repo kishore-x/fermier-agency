@@ -52,9 +52,9 @@ insert into brands (name, slug) values
 -- Products
 with c as (select slug, id from categories), b as (select slug, id from brands)
 insert into products (sku, slug, name, brand_id, manufacturer, category_id, model_number, short_description, description,
-  unit, selling_price, purchase_cost, tax_rate, hsn_code, price_visibility, reorder_threshold, is_featured, status, is_sample_data)
+  unit, selling_price, tax_rate, hsn_code, price_visibility, reorder_threshold, is_featured, status, is_sample_data)
 select v.sku, v.slug, v.name, (select id from b where b.slug = v.brand), v.mfr, (select id from c where c.slug = v.cat),
-  v.model, v.short_d, v.long_d, v.unit, v.price, v.cost, v.tax, v.hsn, v.vis::price_visibility, v.reorder, v.featured,
+  v.model, v.short_d, v.long_d, v.unit, v.price, v.tax, v.hsn, v.vis::price_visibility, v.reorder, v.featured,
   'active', true
 from (values
  ('YT-WN-500E','y-tal-500kg-winch-eco','Y-tal 500 kg Winch — Eco Model','y-tal','Y-tal (sample)','lifting-equipment','YT-500-ECO',
@@ -130,6 +130,14 @@ from (values
   'Compact 100 mm angle grinder with side handle and guard. SAMPLE PRODUCT DATA.',
   'Nos',2450.00,1750.00,18.00,'84672900','show_price',15,false)
 ) as v(sku, slug, name, brand, mfr, cat, model, short_d, long_d, unit, price, cost, tax, hsn, vis, reorder, featured);
+
+insert into product_costs (product_id, purchase_cost)
+select p.id, c.cost from products p join (values
+ ('YT-WN-500E',39000.00),('YT-WN-500P',50500.00),('YT-WN-1000',81000.00),('YT-MC-FR01',21000.00),('FP-PW-2200',14200.00),
+ ('FP-PW-3000',33500.00),('AK-PWD-7HP',43000.00),('AK-BC-52',8600.00),('AT-AC-100L',28800.00),('AT-AC-24L',7300.00),
+ ('PM-GEN-3K',31500.00),('PM-GEN-7K',null),('FP-PT-2000',12400.00),('FP-VC-30L',6500.00),('AK-FG-TH',20500.00),
+ ('PM-WM-200',9600.00),('PM-DB-1500',10900.00),('PM-AG-4',1750.00)
+) as c(sku, cost) on c.sku = p.sku;
 
 -- Specifications (rendered dynamically by the UI)
 insert into product_specifications (product_id, spec_group, label, value, sort_order)

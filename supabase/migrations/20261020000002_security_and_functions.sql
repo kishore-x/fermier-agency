@@ -36,7 +36,7 @@ do $$
 declare t text;
 begin
   foreach t in array array[
-    'roles','permissions','role_permissions','profiles','user_roles','categories','brands','products',
+    'roles','permissions','role_permissions','profiles','user_roles','categories','brands','products','product_costs',
     'product_images','product_specifications','product_documents','product_variants','warehouses',
     'inventory_balances','inventory_movements','stock_reservations','customers','customer_users',
     'customer_addresses','customer_activities','suppliers','supplier_products','enquiries','enquiry_items',
@@ -74,6 +74,11 @@ create policy brands_staff on brands for all to authenticated
 -- products base table is staff-only; the public reads through catalog_products view.
 create policy products_staff_read on products for select to authenticated using (is_staff());
 create policy products_staff_write on products for all to authenticated
+  using (has_any_role(array['super_admin','admin']::app_role[]));
+
+create policy costs_read on product_costs for select to authenticated
+  using (has_any_role(array['super_admin','admin','inventory_manager']::app_role[]));
+create policy costs_write on product_costs for all to authenticated
   using (has_any_role(array['super_admin','admin']::app_role[]));
 
 create policy pimg_public on product_images for select using (
@@ -194,15 +199,25 @@ $$;
 
 create or replace function audit_product_price() returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if new.selling_price is distinct from old.selling_price or new.purchase_cost is distinct from old.purchase_cost
-     or new.status is distinct from old.status then
+  if new.selling_price is distinct from old.selling_price or new.status is distinct from old.status
+     or new.tax_rate is distinct from old.tax_rate then
     perform write_audit('product.updated', 'product', new.id::text,
-      jsonb_build_object('selling_price', old.selling_price, 'purchase_cost', old.purchase_cost, 'status', old.status),
-      jsonb_build_object('selling_price', new.selling_price, 'purchase_cost', new.purchase_cost, 'status', new.status));
+      jsonb_build_object('selling_price', old.selling_price, 'tax_rate', old.tax_rate, 'status', old.status),
+      jsonb_build_object('selling_price', new.selling_price, 'tax_rate', new.tax_rate, 'status', new.status));
   end if;
   return new;
 end $$;
 create trigger trg_audit_product after update on products for each row execute function audit_product_price();
+
+create or replace function audit_product_cost() returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE' and new.purchase_cost is not distinct from old.purchase_cost then return new; end if;
+  perform write_audit('product.cost_changed', 'product', new.product_id::text,
+    case when tg_op = 'UPDATE' then jsonb_build_object('purchase_cost', old.purchase_cost) end,
+    jsonb_build_object('purchase_cost', new.purchase_cost));
+  return new;
+end $$;
+create trigger trg_audit_product_cost after insert or update on product_costs for each row execute function audit_product_cost();
 
 create or replace function audit_user_roles() returns trigger language plpgsql security definer set search_path = public as $$
 begin
