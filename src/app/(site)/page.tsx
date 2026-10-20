@@ -70,9 +70,10 @@ export default async function HomePage() {
           {categories.slice(0, 6).map((c) => (
             <Link key={c.id} href={`/catalog/${c.slug}`} className="group flex flex-col rounded-lg border border-line bg-white p-3 shadow-[0_1px_3px_rgba(16,24,40,0.05)] transition-shadow hover:shadow-md">
               <div className="flex h-24 items-center justify-center">
-                {c.image_url
-                  ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={c.image_url} alt="" className="max-h-full max-w-full object-contain" />
-                  : <CategoryIcon slug={c.slug} className="h-12 w-12 text-navy/50" />}
+                {c.image_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={c.image_url} alt="" className="max-h-full max-w-full object-contain" />
+                ) : <CategoryIcon slug={c.slug} className="h-12 w-12 text-navy/50" />}
               </div>
               <div className="mt-2 flex items-end justify-between gap-2 px-1">
                 <span className="text-[15px] font-semibold leading-snug text-ink">{c.name}</span>
