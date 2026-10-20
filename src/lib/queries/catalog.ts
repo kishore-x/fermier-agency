@@ -7,7 +7,7 @@ export type CatalogProduct = {
   id: string; sku: string; slug: string; name: string; model_number: string | null; short_description: string | null;
   display_price: string | null; price_visibility: "show_price" | "on_request"; unit: string; tax_rate: string;
   category_name: string | null; category_slug: string | null; brand_name: string | null; brand_slug: string | null;
-  available_qty: string; image_url: string | null; is_featured: boolean; is_sample_data: boolean;
+  available_qty: string; image_url: string | null; is_featured: boolean; is_sample_data: boolean; featured_rank?: number;
 };
 
 export type CatalogFilters = {
@@ -30,7 +30,7 @@ export async function listCatalog(f: CatalogFilters, pageSize = PAGE_SIZE) {
     case "price_desc": q = q.order("display_price", { ascending: false, nullsFirst: false }); break;
     case "newest": q = q.order("created_at", { ascending: false }); break;
     case "name": q = q.order("name"); break;
-    default: q = q.order("is_featured", { ascending: false }).order("name");
+    default: q = q.order("is_featured", { ascending: false }).order("featured_rank").order("name");
   }
   const { data, count, error } = await q.range(from, to);
   if (error) throw error;
@@ -52,8 +52,11 @@ export const getBrands = cache(async () => {
 
 export async function getFeatured(limit = 8) {
   const supabase = await createClient();
-  const { data } = await supabase.from("catalog_products").select("*").eq("is_featured", true).order("name").limit(limit);
-  return (data ?? []) as CatalogProduct[];
+  const { data } = await supabase.from("catalog_products").select("*").eq("is_featured", true).order("featured_rank").order("name").limit(limit);
+  const rows = (data ?? []) as CatalogProduct[];
+  const { data: specs } = await supabase.from("product_specifications").select("product_id, value, sort_order")
+    .in("product_id", rows.map((r) => r.id)).order("sort_order");
+  return rows.map((r) => ({ ...r, spec_line: (specs ?? []).filter((x) => x.product_id === r.id).slice(0, 3).map((x) => x.value) }));
 }
 
 export async function getProductBySlug(slug: string) {

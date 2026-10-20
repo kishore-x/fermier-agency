@@ -47,7 +47,8 @@ insert into categories (name, slug, description, sort_order) values
  ('Power Tools','power-tools','Drills, grinders, breakers and cutters',12);
 
 insert into brands (name, slug) values
- ('Y-tal','y-tal'),('Fermier Pro','fermier-pro'),('PowerMax','powermax'),('AgriKing','agriking'),('AirTech','airtech');
+ ('Y-tal','y-tal'),('Fermier Pro','fermier-pro'),('PowerMax','powermax'),('AgriKing','agriking'),('AirTech','airtech'),
+ ('Kaeser','kaeser'),('Bosch','bosch'),('Honda','honda');
 
 -- Products
 with c as (select slug, id from categories), b as (select slug, id from brands)
@@ -89,26 +90,26 @@ from (values
   'Two-stroke side-pack brush cutter with blade and nylon head.',
   'Lightweight 52 cc brush cutter supplied with 3T blade, nylon trimmer head and harness. SAMPLE PRODUCT DATA.',
   'Nos',11500.00,8600.00,12.00,'84332000','show_price',6,false),
- ('AT-AC-100L','air-compressor-100l','Air Compressor 3 HP 100 L','airtech','AirTech (sample)','air-compressors','AT-100L',
-  'Single-stage piston compressor with 100 litre tank.',
-  'Belt-driven twin-cylinder compressor, auto cut-off pressure switch, 100 L horizontal tank. SAMPLE PRODUCT DATA.',
+ ('AT-AC-100L','kaeser-air-compressor','Kaeser Air Compressor','kaeser','Kaeser (sample listing)','air-compressors','KCT-200',
+  'Reliable performance for workshop and site use.',
+  'Belt-driven twin-cylinder piston compressor with 200 L horizontal tank and auto cut-off pressure switch. SAMPLE PRODUCT DATA — price and stock are indicative.',
   'Nos',36500.00,28800.00,18.00,'84148011','show_price',3,true),
  ('AT-AC-24L','air-compressor-24l-portable','Portable Air Compressor 24 L','airtech','AirTech (sample)','air-compressors','AT-24L',
   'Oil-free portable compressor for tyre inflation and spray painting.',
   'Direct-drive oil-free compressor with 24 L tank and quick coupler. SAMPLE PRODUCT DATA.',
   'Nos',9800.00,7300.00,18.00,'84148011','show_price',8,false),
- ('PM-GEN-3K','portable-generator-3kva','Portable Generator 3 kVA Petrol','powermax','PowerMax (sample)','generators','PM-G3000',
-  'Recoil and electric-start petrol generator for site power.',
-  '3 kVA petrol generator with AVR, 15 L fuel tank and low-oil shutdown. SAMPLE PRODUCT DATA.',
-  'Nos',39500.00,31500.00,18.00,'85022010','show_price',3,true),
+ ('PM-GEN-3K','honda-generator','Honda Generator','honda','Honda (sample listing)','generators','EP 5000',
+  'Quiet and fuel efficient for continuous operation.',
+  '5 kVA petrol generator with AVR and low-oil shutdown. SAMPLE PRODUCT DATA — price and stock are indicative.',
+  'Nos',89500.00,31500.00,18.00,'85022010','show_price',3,true),
  ('PM-GEN-7K','diesel-generator-7kva','Diesel Generator 7.5 kVA Silent','powermax','PowerMax (sample)','generators','PM-D7500S',
   'Silent canopy diesel generator for standby power.',
   'Air-cooled diesel engine, acoustic enclosure, ATS-ready control panel. SAMPLE PRODUCT DATA.',
   'Nos',null,null,18.00,'85021100','on_request',1,false),
- ('FP-PT-2000','hand-pallet-truck-2t','Hand Pallet Truck 2 Ton','fermier-pro','Fermier Pro (sample)','material-handling-equipment','FP-HPT2',
-  'Manual hydraulic pallet truck for warehouse handling.',
-  '2 ton capacity, PU wheels, 1150 mm forks, sealed hydraulic pump. SAMPLE PRODUCT DATA.',
-  'Nos',16500.00,12400.00,18.00,'84271000','show_price',4,false),
+ ('FP-PT-2000','semi-electric-stacker','Semi Electric Stacker','fermier-pro','Fermier Pro (sample)','material-handling-equipment','FP-SES15',
+  'Ideal for warehouse and material handling.',
+  'Battery-powered lifting with manual travel, 1.5 ton capacity and 3 m lift height. SAMPLE PRODUCT DATA.',
+  'Nos',145000.00,112000.00,18.00,'84272000','show_price',2,true),
  ('FP-VC-30L','wet-dry-vacuum-30l','Wet & Dry Vacuum Cleaner 30 L','fermier-pro','Fermier Pro (sample)','car-washers-vacuum-cleaners','FP-VC30',
   'Stainless steel tank wet & dry vacuum for car wash bays.',
   '1400 W motor, 30 L stainless tank, blower function and accessory kit. SAMPLE PRODUCT DATA.',
@@ -121,9 +122,9 @@ from (values
   'IGBT inverter ARC welder for site fabrication.',
   'Single-phase IGBT inverter, hot-start and anti-stick, suitable for 2.5–4 mm electrodes. SAMPLE PRODUCT DATA.',
   'Nos',12800.00,9600.00,18.00,'85153100','show_price',5,false),
- ('PM-DB-1500','demolition-breaker-1500w','Demolition Breaker 1500 W','powermax','PowerMax (sample)','power-tools','PM-DB15',
-  'Hexagonal-shank demolition hammer for concrete breaking.',
-  '1500 W demolition breaker, 45 J impact energy, supplied with point and flat chisels. SAMPLE PRODUCT DATA.',
+ ('PM-DB-1500','bosch-rotary-hammer-drill','Bosch Rotary Hammer Drill','bosch','Bosch (sample listing)','power-tools','GBH 2-26',
+  'Heavy-duty drilling for concrete and masonry.',
+  'SDS-plus rotary hammer with drilling, hammer-drilling and chiselling modes. SAMPLE PRODUCT DATA — price and stock are indicative.',
   'Nos',14500.00,10900.00,18.00,'84672900','show_price',4,true),
  ('PM-AG-4','angle-grinder-4in','Angle Grinder 4 inch 850 W','powermax','PowerMax (sample)','power-tools','PM-AG850',
   '850 W angle grinder for cutting and grinding.',
@@ -135,9 +136,31 @@ insert into product_costs (product_id, purchase_cost)
 select p.id, c.cost from products p join (values
  ('YT-WN-500E',39000.00),('YT-WN-500P',50500.00),('YT-WN-1000',81000.00),('YT-MC-FR01',21000.00),('FP-PW-2200',14200.00),
  ('FP-PW-3000',33500.00),('AK-PWD-7HP',43000.00),('AK-BC-52',8600.00),('AT-AC-100L',28800.00),('AT-AC-24L',7300.00),
- ('PM-GEN-3K',31500.00),('PM-GEN-7K',null),('FP-PT-2000',12400.00),('FP-VC-30L',6500.00),('AK-FG-TH',20500.00),
+ ('PM-GEN-3K',72000.00),('PM-GEN-7K',null),('FP-PT-2000',112000.00),('FP-VC-30L',6500.00),('AK-FG-TH',20500.00),
  ('PM-WM-200',9600.00),('PM-DB-1500',10900.00),('PM-AG-4',1750.00)
 ) as c(sku, cost) on c.sku = p.sku;
+
+update products set is_featured = false;
+update products p set is_featured = true, featured_rank = r.rank
+from (values ('AT-AC-100L',1),('PM-DB-1500',2),('FP-PT-2000',3),('PM-GEN-3K',4),('YT-WN-500P',5),('YT-WN-500E',6)) as r(sku, rank)
+where p.sku = r.sku;
+
+-- Category and product photos (cropped from the reference design; replace with licensed photography)
+update categories c set image_url = v.url from (values
+ ('construction-equipment','/demo/cat-construction.jpg'),('lifting-equipment','/demo/cat-lifting.jpg'),
+ ('material-handling-equipment','/demo/cat-material.jpg'),('generators','/demo/cat-generators.jpg'),
+ ('car-washers-vacuum-cleaners','/demo/cat-washers.jpg'),('agriculture-garden-equipment','/demo/cat-agri.jpg'),
+ ('pressure-washers','/demo/quick-washer.jpg'),('mini-cranes','/demo/quick-winch.jpg'),('air-compressors','/demo/prod-compressor.jpg'),
+ ('power-tools','/demo/prod-drill.jpg')
+) as v(slug, url) where c.slug = v.slug;
+
+insert into product_images (product_id, url, alt, sort_order)
+select p.id, v.url, p.name, 0 from products p join (values
+ ('AT-AC-100L','/demo/prod-compressor.jpg'),('PM-DB-1500','/demo/prod-drill.jpg'),('FP-PT-2000','/demo/prod-stacker.jpg'),
+ ('PM-GEN-3K','/demo/prod-generator.jpg'),('YT-WN-500P','/demo/quick-winch.jpg'),('YT-WN-500E','/demo/quick-winch.jpg'),
+ ('PM-GEN-7K','/demo/cat-generators.jpg'),('FP-PW-2200','/demo/cat-washers.jpg'),('FP-PW-3000','/demo/quick-washer.jpg'),
+ ('AK-PWD-7HP','/demo/cat-agri.jpg')
+) as v(sku, url) on v.sku = p.sku;
 
 -- Specifications (rendered dynamically by the UI)
 insert into product_specifications (product_id, spec_group, label, value, sort_order)
@@ -162,17 +185,17 @@ join (values
  ('AK-PWD-7HP','Engine','Engine','7 HP, 4-stroke petrol',1),('AK-PWD-7HP','Engine','Fuel tank','3.6 L',2),
  ('AK-PWD-7HP','Performance','Tilling width','900 mm',3),('AK-PWD-7HP','Performance','Tilling depth','100–150 mm',4),
  ('AK-BC-52','Engine','Displacement','52 cc, 2-stroke',1),('AK-BC-52','Engine','Power','1.4 kW',2),('AK-BC-52','Accessories','Included','3T blade, nylon head, harness',3),
- ('AT-AC-100L','Motor','Motor power','3 HP',1),('AT-AC-100L','Motor','Phase','Single phase',2),
- ('AT-AC-100L','Performance','Tank capacity','100 L',3),('AT-AC-100L','Performance','Max pressure','8 bar',4),('AT-AC-100L','Performance','Air delivery','10 CFM',5),
+ ('AT-AC-100L','Motor','Motor power','3 HP',1),('AT-AC-100L','Performance','Tank capacity','200 L',2),('AT-AC-100L','Performance','Max pressure','8 bar',3),
+ ('AT-AC-100L','Motor','Phase','Single phase',4),('AT-AC-100L','Performance','Air delivery','10 CFM',5),
  ('AT-AC-24L','Motor','Power','1.5 HP',1),('AT-AC-24L','Performance','Tank capacity','24 L',2),('AT-AC-24L','Performance','Max pressure','8 bar',3),('AT-AC-24L','Performance','Type','Oil-free',4),
- ('PM-GEN-3K','Output','Rated output','3 kVA',1),('PM-GEN-3K','Output','Voltage','230 V',2),('PM-GEN-3K','Engine','Fuel','Petrol',3),
- ('PM-GEN-3K','Engine','Fuel tank','15 L',4),('PM-GEN-3K','Engine','Start','Recoil + electric',5),
+ ('PM-GEN-3K','Output','Rated output','5 kVA',1),('PM-GEN-3K','Engine','Fuel','Petrol',2),('PM-GEN-3K','Output','Phase','Single Phase',3),
+ ('PM-GEN-3K','Output','Voltage','230 V',4),('PM-GEN-3K','Engine','Fuel tank','24 L',5),
  ('PM-GEN-7K','Output','Rated output','7.5 kVA',1),('PM-GEN-7K','Output','Phase','Single phase',2),('PM-GEN-7K','Engine','Fuel','Diesel',3),('PM-GEN-7K','Engine','Noise level','68 dB @ 7 m',4),
- ('FP-PT-2000','Performance','Capacity','2000 kg',1),('FP-PT-2000','Dimensions','Fork length','1150 mm',2),('FP-PT-2000','Dimensions','Fork width','550 mm',3),('FP-PT-2000','Wheels','Wheel material','Polyurethane',4),
+ ('FP-PT-2000','Performance','Capacity','1.5 Ton',1),('FP-PT-2000','Performance','Lift height','3 m Lift',2),('FP-PT-2000','Power','Lift drive','Battery electric',3),('FP-PT-2000','Power','Travel','Manual',4),
  ('FP-VC-30L','Motor','Power','1400 W',1),('FP-VC-30L','Performance','Tank capacity','30 L',2),('FP-VC-30L','Performance','Tank material','Stainless steel',3),
  ('AK-FG-TH','Performance','Chemical tank','6 L',1),('AK-FG-TH','Performance','Fuel tank','1.2 L petrol',2),('AK-FG-TH','Performance','Ignition','Battery',3),
  ('PM-WM-200','Electrical','Input','Single phase 230 V',1),('PM-WM-200','Electrical','Output current','20–200 A',2),('PM-WM-200','Electrical','Electrode size','2.5–4 mm',3),
- ('PM-DB-1500','Motor','Power','1500 W',1),('PM-DB-1500','Performance','Impact energy','45 J',2),('PM-DB-1500','Performance','Shank','30 mm hex',3),
+ ('PM-DB-1500','Motor','Power','800 W',1),('PM-DB-1500','Performance','Max drilling (concrete)','26 mm',2),('PM-DB-1500','Performance','Impact energy','2.7 J',3),('PM-DB-1500','Performance','Chuck','SDS-plus',4),
  ('PM-AG-4','Motor','Power','850 W',1),('PM-AG-4','Performance','Disc diameter','100 mm',2),('PM-AG-4','Performance','No-load speed','11,000 rpm',3)
 ) as s(sku, grp, label, value, ord) on s.sku = p.sku;
 

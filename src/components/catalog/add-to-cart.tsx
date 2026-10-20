@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus, ShoppingCart } from "lucide-react";
+import { ArrowRight, Minus, Plus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/primitives";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
@@ -9,15 +9,15 @@ import { useCart } from "./cart";
 
 type P = { id: string; slug: string; sku: string; name: string; display_price: string | null; image_url: string | null; unit: string };
 
-export function AddToCartButton({ product, className, compact, withQty }: { product: P; className?: string; compact?: boolean; withQty?: boolean }) {
+export function AddToCartButton({ product, className, compact, withQty, label: forcedLabel, arrow }: { product: P; className?: string; compact?: boolean; withQty?: boolean; label?: string; arrow?: boolean }) {
   const cart = useCart();
   const [qty, setQty] = useState(1);
   const add = () => {
     cart.add({ productId: product.id, slug: product.slug, sku: product.sku, name: product.name, price: product.display_price,
       imageUrl: product.image_url, unit: product.unit }, qty);
-    toast(`${product.name} added to your enquiry cart`);
+    toast(`${product.name} added to your quote request`);
   };
-  const label = product.display_price ? "Add to cart" : "Request quote";
+  const label = forcedLabel ?? (product.display_price ? "Add to cart" : "Request quote");
   return (
     <div className={cn("flex items-center gap-2", className)}>
       {withQty && (
@@ -30,7 +30,7 @@ export function AddToCartButton({ product, className, compact, withQty }: { prod
         </div>
       )}
       <Button type="button" variant="success" size={compact ? "sm" : "lg"} className="flex-1" onClick={add}>
-        <ShoppingCart className="h-4 w-4" /> {label}
+        {!arrow && <ShoppingCart className="h-4 w-4" />} {label}{arrow && <ArrowRight className="h-4 w-4" />}
       </Button>
     </div>
   );

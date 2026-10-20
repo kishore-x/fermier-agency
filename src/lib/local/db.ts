@@ -78,14 +78,25 @@ async function loadMeta(db: PGlite): Promise<Meta> {
 
 async function initialise(state: State, fresh: boolean) {
   const { db } = state;
+  const root = join(process.cwd(), "supabase");
+  const migrations = readdirSync(join(root, "migrations")).filter((x) => x.endsWith(".sql")).sort();
   if (fresh) {
-    const root = join(process.cwd(), "supabase");
     await db.exec(PLATFORM_STUB);
-    for (const f of readdirSync(join(root, "migrations")).filter((x) => x.endsWith(".sql")).sort()) {
-      await db.exec(readFileSync(join(root, "migrations", f), "utf8"));
-    }
+    for (const f of migrations) await db.exec(readFileSync(join(root, "migrations", f), "utf8"));
     await db.exec(readFileSync(join(root, "seed.sql"), "utf8"));
     await db.exec("create table public._local_meta (key text primary key, value text); revoke all on public._local_meta from anon, authenticated;");
+    for (const f of migrations) await db.query("insert into public._local_meta values ($1, now()::text)", [`migration:${f}`]);
+  } else {
+    // Apply migrations added since this local database was created.
+    const done = new Set((await db.query<{ key: string }>("select key from public._local_meta where key like 'migration:%'")).rows.map((r) => r.key));
+    for (const f of migrations) {
+      if (done.has(`migration:${f}`)) continue;
+      await db.transaction(async (tx) => {
+        await tx.exec(readFileSync(join(root, "migrations", f), "utf8"));
+        await tx.query("insert into public._local_meta values ($1, now()::text)", [`migration:${f}`]);
+      });
+      console.log(`[local-db] applied migration ${f}`);
+    }
   }
   state.meta = await loadMeta(db);
   if (fresh) {

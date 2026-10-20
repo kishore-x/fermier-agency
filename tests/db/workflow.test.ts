@@ -44,6 +44,8 @@ describe("seed", () => {
     expect(rows.rows[0]).not.toHaveProperty("purchase_cost");
     const onRequest = rows.rows.find((r) => r.sku === "YT-WN-1000")!;
     expect(onRequest.display_price).toBeNull();
+    const specs = await asUser(db, null, (tx) => tx.query("select s.* from product_specifications s where s.product_id = $1", [onRequest.id]));
+    expect(specs.rows.length).toBeGreaterThan(0);
     await expect(asUser(db, null, (tx) => tx.query("select purchase_cost from product_costs"))).resolves.toMatchObject({ rows: [] });
     await expect(asUser(db, null, (tx) => tx.query("select * from products"))).resolves.toMatchObject({ rows: [] });
   });
