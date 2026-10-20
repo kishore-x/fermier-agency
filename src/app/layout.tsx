@@ -3,8 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toast";
 import { CartProvider } from "@/components/catalog/cart";
-import { SetupRequired } from "@/components/setup-required";
-import { env } from "@/lib/env";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
@@ -17,7 +15,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full">
-        {env.isConfigured() ? <CartProvider>{children}</CartProvider> : <SetupRequired />}
+        <CartProvider>{children}</CartProvider>
         <Toaster />
       </body>
     </html>
