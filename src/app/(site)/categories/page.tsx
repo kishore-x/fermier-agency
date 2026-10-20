@@ -25,8 +25,8 @@ export default async function CategoriesPage() {
               ) : <CategoryIcon slug={c.slug} className="h-14 w-14 text-navy/40" />}
             </div>
             <p className="mt-3 text-sm font-bold text-ink-900">{c.name}</p>
-            {c.description && <p className="mt-1 text-xs text-muted">{c.description}</p>}
-            <div className="mt-3 flex items-center justify-between text-xs">
+            {c.description && <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted" title={c.description}>{c.description}</p>}
+            <div className="mt-auto flex pt-3 items-center justify-between text-xs">
               <span className="text-muted">{n(c.slug)} product{n(c.slug) === 1 ? "" : "s"}</span>
               <span className="flex items-center gap-1 font-bold uppercase tracking-wide text-brand">Explore <ArrowRight className="h-3.5 w-3.5" /></span>
             </div>
