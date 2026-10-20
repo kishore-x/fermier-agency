@@ -299,3 +299,34 @@ describe("cost visibility and reports", () => {
       .rejects.toThrow(/FORBIDDEN/);
   });
 });
+
+describe("product master", () => {
+  it("save_product writes product, cost and specs atomically; duplicate SKU rejected", async () => {
+    const cat = (await one<{ id: string }>(db, "select id from categories where slug='power-tools'")).id;
+    const id = await asUser(db, admin, async (tx) => (await one<{ save_product: string }>(tx,
+      "select save_product(null, $1, $2, 999.50, true)", [JSON.stringify({ sku: "test-drill", slug: "test-drill", name: "Test Drill",
+        category_id: cat, selling_price: "1500", status: "active", price_visibility: "show_price" }),
+      JSON.stringify([{ spec_group: "Motor", label: "Power", value: "600 W" }, { label: "", value: "skip" }])])).save_product);
+    const specs = await db.query("select * from product_specifications where product_id = $1", [id]);
+    expect(specs.rows).toHaveLength(1);
+    expect((await one<{ purchase_cost: string }>(db, "select purchase_cost from product_costs where product_id=$1", [id])).purchase_cost).toBe("999.50");
+    await expect(asUser(db, admin, (tx) => tx.query("select save_product(null, $1, null, null, false)",
+      [JSON.stringify({ sku: "TEST-DRILL", slug: "x2", name: "Dup", category_id: cat })]))).rejects.toThrow(/duplicate|unique/i);
+    await expect(asUser(db, exec, (tx) => tx.query("select save_product(null, $1, null, null, false)",
+      [JSON.stringify({ sku: "Z", slug: "z", name: "Z" })]))).rejects.toThrow(/FORBIDDEN/);
+  });
+
+  it("CSV import is all-or-nothing", async () => {
+    const before = Number((await one<{ n: string }>(db, "select count(*) n from products")).n);
+    await expect(asUser(db, admin, (tx) => tx.query("select import_products($1, 'create_only')", [JSON.stringify([
+      { sku: "IMP-1", name: "Imported One", category_slug: "generators", opening_stock: "5" },
+      { sku: "IMP-2", name: "Imported Two", category_slug: "no-such-category" },
+    ])]))).rejects.toThrow(/unknown category/);
+    expect(Number((await one<{ n: string }>(db, "select count(*) n from products")).n)).toBe(before);
+    const res = await asUser(db, admin, (tx) => one<{ import_products: { created: number } }>(tx, "select import_products($1, 'create_only')", [JSON.stringify([
+      { sku: "IMP-1", name: "Imported One", category_slug: "generators", opening_stock: "5", brand_name: "NewBrand" },
+    ])]));
+    expect(res.import_products.created).toBe(1);
+    expect(Number((await balance("IMP-1")).on_hand)).toBe(5);
+  });
+});
