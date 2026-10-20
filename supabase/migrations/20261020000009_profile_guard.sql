@@ -22,3 +22,7 @@ begin
   where id = v;
   insert into customer_activities(customer_id, activity_type, summary, created_by) values (v, 'account', 'Customer updated company contact details', auth.uid());
 end $$;
+
+-- Customers may see the name/email of their own assigned salesperson.
+create policy profiles_my_salesperson on profiles for select to authenticated
+  using (id = (select salesperson_id from customers where id = my_customer_id()));
