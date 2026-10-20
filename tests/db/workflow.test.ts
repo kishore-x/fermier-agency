@@ -341,3 +341,21 @@ describe("sales executive scope", () => {
     expect((await one<{ phone: string }>(db, "select phone from customers where id=$1", [c3])).phone).toBe("y");
   });
 });
+
+describe("profile privilege guard", () => {
+  it("staff cannot raise their own discount limit", async () => {
+    await expect(asUser(db, exec, (tx) => tx.query("update profiles set discount_limit_pct = 90 where id = $1", [exec]))).rejects.toThrow(/FORBIDDEN/);
+    await asUser(db, exec, (tx) => tx.query("update profiles set full_name = 'Exec Renamed' where id = $1", [exec]));
+    await asUser(db, admin, (tx) => tx.query("update profiles set discount_limit_pct = 15 where id = $1", [exec]));
+  });
+
+  it("delivery confirmation completes the order lifecycle", async () => {
+    const so = (await one<{ id: string }>(db, "select id from sales_orders where status = 'dispatched' limit 1")).id;
+    const ds = (await db.query<{ id: string }>("select id from dispatches where sales_order_id = $1", [so])).rows;
+    for (const d of ds) await asUser(db, inventory, (tx) => tx.query("select confirm_delivery($1, 'POD ok')", [d.id]));
+    expect((await one<{ status: string }>(db, "select status from sales_orders where id=$1", [so])).status).toBe("delivered");
+    await asUser(db, manager, (tx) => tx.query("select complete_sales_order($1)", [so]));
+    const n = await one<{ n: string }>(db, "select count(*) n from notifications where event_type = 'sales_order.delivered'");
+    expect(Number(n.n)).toBeGreaterThan(0);
+  });
+});
