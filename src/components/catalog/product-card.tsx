@@ -18,7 +18,7 @@ export function ProductCard({ p, whatsapp }: { p: CatalogCardProduct; whatsapp?:
   const wa = whatsappLink(whatsapp, `Hello, I'd like a quote for ${p.name} (Code: ${p.sku}).`);
   return (
     <div className="group flex flex-col overflow-hidden rounded-md border border-[#dde5ee] bg-white shadow-[0_1px_3px_rgba(14,27,44,0.06)] transition-shadow hover:shadow-lg">
-      <Link href={`/products/${p.slug}`} className="flex min-h-[46px] items-center justify-between gap-2 bg-[#20244f] px-3 py-1.5 text-white">
+      <Link href={`/products/${p.slug}`} className="flex min-h-[46px] items-center justify-between gap-2 bg-navy px-3 py-1.5 text-white">
         <span className="font-display text-[12.5px] font-bold uppercase leading-tight">{ratings.map((r) => <span key={r} className="block">{r}</span>)}</span>
         <span className="text-right font-display text-[13px] font-bold uppercase leading-tight">{p.type ?? p.category_name}</span>
       </Link>

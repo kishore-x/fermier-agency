@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-navy: #191a3d;
-  --color-navy-700: #26284f;
-  --color-navy-50: #eceef7;
+  /* Fermier logo blue #1B6196, deepened for dark surfaces */
+  --color-navy: #0f3557;
+  --color-navy-700: #154a75;
+  --color-navy-50: #e8f0f7;
+  --color-logo: #1b6196;
   --color-brand: #077ff4;
   --color-brand-600: #0567d0;
   --color-brand-50: #e8f2fe;

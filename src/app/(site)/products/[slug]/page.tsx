@@ -163,7 +163,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
             <div className="mt-4 grid gap-4 lg:grid-cols-2">
               {Object.entries(groups).map(([group, rows]) => (
                 <div key={group} className="overflow-hidden rounded-md border border-[#dde5ee] bg-white">
-                  <p className="bg-[#20244f] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">{group}</p>
+                  <p className="bg-navy px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">{group}</p>
                   <table className="w-full text-sm">
                     <tbody>
                       {rows.map((r, i) => (
@@ -177,7 +177,7 @@ export default async function ProductPage({ params }: PageProps<"/products/[slug
                 </div>
               ))}
               <div className="overflow-hidden rounded-md border border-[#dde5ee] bg-white">
-                <p className="bg-[#20244f] px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">Commercial</p>
+                <p className="bg-navy px-4 py-2 text-xs font-bold uppercase tracking-wider text-white">Commercial</p>
                 <table className="w-full text-sm"><tbody>
                   {[["Brand", p.brand_name], ["Model", p.model_number], ["Product code", p.sku], ["HSN code", p.hsn_code], ["GST", `${Number(p.tax_rate)}%`], ["Unit", p.unit]].filter(([, v]) => v).map(([k, v], i) => (
                     <tr key={k} className={i % 2 ? "bg-band/50" : ""}><th scope="row" className="w-1/2 px-4 py-2.5 text-left font-medium text-[#5b6472]">{k}</th><td className="px-4 py-2.5 font-semibold text-ink-900">{v}</td></tr>

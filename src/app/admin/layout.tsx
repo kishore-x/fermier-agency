@@ -5,6 +5,8 @@ import { signOut } from "@/app/(auth)/actions";
 import { can, requireStaff, ROLE_LABEL, type Session } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
+export const metadata = { title: { default: "Operations", template: "%s · Fermier Agency Operations" } };
+
 function allowedNav(s: Session): NavKey[] {
   const keys: NavKey[] = ["overview", "products", "inventory", "customers", "enquiries", "quotations", "purchase-orders", "sales-orders", "dispatches", "invoices", "reports"];
   if (can.manageProducts(s)) keys.push("categories", "brands", "suppliers", "settings");
@@ -28,7 +30,8 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <div className="flex min-h-screen">
       <AdminSidebar allowed={allowedNav(session)} badges={{ enquiries: newEnq ?? 0, quotations: pendingApproval ?? 0, "purchase-orders": posToVerify ?? 0 }} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center justify-end gap-2 border-b border-line bg-white px-4 pl-16 lg:pl-4">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-end gap-3 border-b border-line bg-white px-4 pl-16 shadow-[0_1px_0_rgba(27,97,150,0.06)] lg:pl-4">
+          <span className="mr-auto hidden text-[11px] font-bold uppercase tracking-[0.14em] text-logo lg:block">Operations</span>
           <Link href="/admin/notifications" className="relative rounded-md p-2 text-muted hover:bg-canvas hover:text-ink" aria-label={`Notifications, ${unread ?? 0} unread`}>
             <Bell className="h-5 w-5" />
             {!!unread && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-brand" />}
@@ -37,11 +40,14 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
             <p className="font-medium leading-tight">{session.fullName}</p>
             <p className="text-xs text-muted">{session.roles.map((r) => ROLE_LABEL[r]).join(", ")}</p>
           </div>
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-logo text-xs font-bold text-white" aria-hidden>
+            {session.fullName.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("")}
+          </span>
           <form action={signOut}>
             <button className="rounded-md p-2 text-muted hover:bg-canvas hover:text-ink" aria-label="Sign out" title="Sign out"><LogOut className="h-5 w-5" /></button>
           </form>
         </header>
-        <main className="flex-1 p-4 md:p-6">{children}</main>
+        <main className="flex-1 bg-[#f4f7fb] p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

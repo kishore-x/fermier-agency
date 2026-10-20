@@ -121,7 +121,7 @@ export default async function CategoryPage({ params, searchParams }: PageProps<"
             <div className="mt-4 overflow-x-auto rounded-md border border-[#dde5ee] bg-white">
               <table className="w-full min-w-[760px] text-sm">
                 <thead>
-                  <tr className="bg-[#20244f] text-left text-xs font-bold uppercase tracking-wider text-white">
+                  <tr className="bg-navy text-left text-xs font-bold uppercase tracking-wider text-white">
                     <th className="px-4 py-3">Model</th><th className="px-4 py-3">Brand</th>
                     {comparison.columns.map((col) => <th key={col} className="px-4 py-3">{col}</th>)}
                     <th className="px-4 py-3 text-right">Price</th><th className="px-4 py-3" />
