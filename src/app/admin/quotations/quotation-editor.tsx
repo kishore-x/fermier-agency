@@ -39,7 +39,7 @@ export function QuotationEditor({ header, lines: initial, products, customers, a
     <ActionForm action={saveQuotation} className="space-y-4">
       <input type="hidden" name="id" value={header.id ?? ""} />
       <input type="hidden" name="enquiry_id" value={header.enquiry_id ?? ""} />
-      <input type="hidden" name="items" value={JSON.stringify(lines.filter((l) => l.product_id).map(({ key: _k, ...l }) => l))} />
+      <input type="hidden" name="items" value={JSON.stringify(lines.filter((l) => l.product_id).map((l) => ({ product_id: l.product_id, quantity: l.quantity, unit_price: l.unit_price, discount_pct: l.discount_pct, description: l.description })))} />
       {header.status === "sent" && <Alert tone="warn">This quotation was already sent. Saving creates a new revision and it must be approved and sent again. Earlier versions stay in the history.</Alert>}
 
       <Card>

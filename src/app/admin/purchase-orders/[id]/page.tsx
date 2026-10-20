@@ -78,7 +78,10 @@ export default async function PoDetail({ params }: PageProps<"/admin/purchase-or
         <Card className="overflow-hidden">
           <CardHeader title={po.file_name ?? "PO document"} action={signed.data && <Link href={signed.data.signedUrl} target="_blank" className="flex items-center gap-1 text-sm text-navy hover:underline">Open <ExternalLink className="h-3.5 w-3.5" /></Link>} />
           {signed.data ? (isPdf ? <iframe src={signed.data.signedUrl} className="h-[640px] w-full" title="PO document preview" />
-            : /* eslint-disable-next-line @next/next/no-img-element */ <img src={signed.data.signedUrl} alt="PO document" className="w-full" />)
+            : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={signed.data.signedUrl} alt="PO document" className="w-full" />
+            ))
             : <p className="p-6 text-sm text-muted">No document available.</p>}
         </Card>
       </div>
