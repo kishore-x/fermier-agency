@@ -42,3 +42,6 @@ next-env.d.ts
 .env*.local
 !.env.example
 .data/
+
+# demo database snapshot (built by `npm run snapshot` before every build)
+/demo-snapshot/

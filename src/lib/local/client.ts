@@ -1,14 +1,17 @@
 import "server-only";
-import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, normalize } from "node:path";
-import { DATA_DIR, localState, withContext, type Ctx } from "./db";
+import { join, normalize } from "node:path";
+import { DATA_DIR, localState, SERVERLESS, withContext, type Ctx } from "./db";
 import { callRpc, QueryBuilder } from "./query";
 
 export const SESSION_COOKIE = "fa_session";
 
 function secret() {
   if (process.env.LOCAL_AUTH_SECRET) return process.env.LOCAL_AUTH_SECRET;
+  // Serverless instances share nothing on disk, so they need the same key to accept each other's login cookies.
+  // Demo-grade only: set LOCAL_AUTH_SECRET in the host's environment variables to replace it.
+  if (SERVERLESS) return createHash("sha256").update(`fermier-demo:${process.env.VERCEL_PROJECT_ID ?? ""}`).digest("hex");
   const f = join(DATA_DIR, "secret");
   if (!existsSync(f)) { mkdirSync(DATA_DIR, { recursive: true }); writeFileSync(f, randomBytes(32).toString("hex"), { mode: 0o600 }); }
   return readFileSync(f, "utf8").trim();
@@ -121,10 +124,7 @@ export function createLocalClient(opts: { cookies?: Cookies; service?: boolean; 
               if (!b.rows[0]) throw new Error("Bucket not found");
               if (b.rows[0].file_size_limit && buf.length > Number(b.rows[0].file_size_limit)) throw new Error("The object exceeded the maximum allowed size");
               if (b.rows[0].allowed_mime_types && !b.rows[0].allowed_mime_types.includes(type)) throw new Error(`mime type ${type} is not supported`);
-              await tx.query("insert into storage.objects (bucket_id, name, owner, mimetype, size) values ($1, $2, auth.uid(), $3, $4)", [bucket, path, type, buf.length]);
-              const f = filePath(bucket, path);
-              mkdirSync(dirname(f), { recursive: true });
-              writeFileSync(f, buf);
+              await tx.query("insert into storage.objects (bucket_id, name, owner, mimetype, size, data) values ($1, $2, auth.uid(), $3, $4, $5)", [bucket, path, type, buf.length, new Uint8Array(buf)]);
             }, { skipReady: skip });
             return { data: { path }, error: null };
           } catch (e) {

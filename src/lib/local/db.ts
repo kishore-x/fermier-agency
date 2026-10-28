@@ -6,7 +6,11 @@ import { existsSync, mkdirSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 // Local mock backend: an embedded Postgres running the real migrations, RLS policies and functions.
-export const DATA_DIR = join(process.cwd(), ".data");
+// On serverless hosts (Vercel) the project folder is read-only, so the database runs in memory instead:
+// it is loaded from the pre-seeded snapshot made at build time (see scripts/build-demo-snapshot.ts).
+export const SERVERLESS = !!process.env.VERCEL || process.env.LOCAL_DB_MEMORY === "1";
+export const DATA_DIR = SERVERLESS ? "/tmp/fermier-data" : join(process.cwd(), ".data");
+export const SNAPSHOT_FILE = join(process.cwd(), "demo-snapshot", "fermier-db.tar.gz");
 
 const PLATFORM_STUB = `
 create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
@@ -21,7 +25,7 @@ create schema storage;
 create table storage.buckets (id text primary key, name text not null, public boolean default false, file_size_limit bigint, allowed_mime_types text[]);
 create table storage.objects (
   id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets(id), name text not null,
-  owner uuid, mimetype text, size bigint, created_at timestamptz default now(), unique (bucket_id, name)
+  owner uuid, mimetype text, size bigint, data bytea, created_at timestamptz default now(), unique (bucket_id, name)
 );
 alter table storage.objects enable row level security;
 create function storage.foldername(name text) returns text[] language sql immutable as $$
@@ -88,6 +92,8 @@ async function initialise(state: State, fresh: boolean) {
     await db.exec("create table public._local_meta (key text primary key, value text); revoke all on public._local_meta from anon, authenticated;");
     for (const f of migrations) await db.query("insert into public._local_meta values ($1, now()::text)", [`migration:${f}`]);
   } else {
+    // Uploaded files live in the database (so they survive in the snapshot); older local databases lack the column.
+    await db.exec("alter table storage.objects add column if not exists data bytea");
     // Apply migrations added since this local database was created.
     const done = new Set((await db.query<{ key: string }>("select key from public._local_meta where key like 'migration:%'")).rows.map((r) => r.key));
     for (const f of migrations) {
@@ -107,12 +113,21 @@ async function initialise(state: State, fresh: boolean) {
   }
 }
 
+function openDb(): { db: PGlite; fresh: boolean } {
+  const extensions = { pg_trgm, pgcrypto };
+  if (SERVERLESS) {
+    const useSnapshot = process.env.LOCAL_DB_SNAPSHOT !== "0" && existsSync(SNAPSHOT_FILE);
+    if (useSnapshot) return { db: new PGlite({ extensions, loadDataDir: new Blob([readFileSync(SNAPSHOT_FILE)]) }), fresh: false };
+    return { db: new PGlite({ extensions }), fresh: true };
+  }
+  mkdirSync(DATA_DIR, { recursive: true });
+  const dir = join(DATA_DIR, "pglite");
+  return { db: new PGlite(dir, { extensions }), fresh: !existsSync(join(dir, "PG_VERSION")) };
+}
+
 export function localState(): State {
   if (!g.__fermierLocal) {
-    mkdirSync(DATA_DIR, { recursive: true });
-    const dir = join(DATA_DIR, "pglite");
-    const fresh = !existsSync(join(dir, "PG_VERSION"));
-    const db = new PGlite(dir, { extensions: { pg_trgm, pgcrypto } });
+    const { db, fresh } = openDb();
     const state: State = { db, meta: { fks: [], pks: {}, fns: {} }, ready: Promise.resolve(), queue: Promise.resolve() };
     g.__fermierLocal = state;
     state.ready = db.waitReady.then(() => initialise(state, fresh)).catch((e) => {

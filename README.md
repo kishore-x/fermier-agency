@@ -67,10 +67,18 @@ If the Supabase variables are missing, the app runs in **local demo mode** (next
 
 ### Local demo mode (no Supabase)
 
-With no `NEXT_PUBLIC_SUPABASE_URL` set, `npm run dev` starts an embedded Postgres (PGlite) in `.data/`, applies the same migrations, RLS policies and seed, and creates the demo accounts and sample orders on first start. Sign-in uses local accounts (signed session cookie), uploads are stored in `.data/storage`. The login page lists one-click demo accounts; password `demo1234` (override with `DEMO_PASSWORD`).
+With no `NEXT_PUBLIC_SUPABASE_URL` set, `npm run dev` starts an embedded Postgres (PGlite) in `.data/`, applies the same migrations, RLS policies and seed, and creates the demo accounts and sample orders on first start. Sign-in uses local accounts (signed session cookie); uploaded files are stored in the database. The login page lists one-click demo accounts; password `demo1234` (override with `DEMO_PASSWORD`).
 
 - Reset the demo data: stop the server, `rm -rf .data`, start again.
-- Local mode is for demos on one machine. It is not for production or for Vercel, whose serverless filesystem is not persistent. Use Supabase for anything shared.
+
+### Hosted demo on Vercel (no Supabase)
+
+The demo also runs on Vercel with no database service at all. `npm run build` first runs `npm run snapshot`, which builds the fully seeded demo database (catalogue, demo accounts, sample orders) into `demo-snapshot/fermier-db.tar.gz`. On Vercel the app loads that snapshot into memory when it starts, so pages are fast and nothing is written to disk. Every button works: enquiries, quotes, POs, uploads and status changes are saved in memory.
+
+- Changes made during a demo last while the server instance is warm. When Vercel recycles it (after idle time or a redeploy) the site goes back to the seeded data, which is fine for demos but not for real use.
+- Vercel can occasionally run two instances at once, each with its own copy, so a change may not show on every page load under heavy traffic.
+- Optional: set `LOCAL_AUTH_SECRET` (any long random string) in Vercel's environment variables to sign login cookies with your own key.
+- For production, connect Supabase (sections 2–3).
 
 ---
 
@@ -124,6 +132,10 @@ npm run build
 ---
 
 ## 6. Deploying to Vercel
+
+**Demo only (no Supabase):** import the repo in Vercel and deploy; no environment variables are needed. See "Hosted demo on Vercel" above.
+
+**Production (Supabase):**
 
 1. Push the repo to GitHub and import it in Vercel (framework: Next.js).
 2. Add every variable from section 2 in **Project → Settings → Environment Variables**. Set `NEXT_PUBLIC_SITE_URL` to the production URL.

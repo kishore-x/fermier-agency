@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 4480",
-    "build": "next build",
+    "build": "npm run snapshot && next build",
+    "snapshot": "tsx --conditions=react-server scripts/build-demo-snapshot.ts",
     "start": "next start -p 4480",
     "lint": "eslint",
     "test": "vitest run",
