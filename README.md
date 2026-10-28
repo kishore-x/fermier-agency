@@ -128,7 +128,7 @@ npm run build
 1. Push the repo to GitHub and import it in Vercel (framework: Next.js).
 2. Add every variable from section 2 in **Project → Settings → Environment Variables**. Set `NEXT_PUBLIC_SITE_URL` to the production URL.
 3. In Supabase **Auth → URL configuration**, add the Vercel URL as Site URL / redirect URL.
-4. Deploy. `vercel.json` schedules `/api/cron/integrations` every 15 minutes (processes queued invoice jobs and syncs payment status). Vercel sends `Authorization: Bearer $CRON_SECRET` automatically. Note: Hobby plans only allow daily crons — use Pro, or call the endpoint from an external scheduler.
+4. Deploy. `vercel.json` schedules `/api/cron/integrations` once a day at 00:30 UTC (06:00 IST) so it works on the Vercel Hobby plan; it processes queued invoice jobs and syncs payment status. Vercel sends `Authorization: Bearer $CRON_SECRET` automatically. For faster syncing, use Pro and set the schedule to `*/15 * * * *`, call the endpoint from an external scheduler, or retry jobs from Admin → Integrations.
 
 ---
 
